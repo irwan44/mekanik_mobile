@@ -7,10 +7,11 @@ class AssetsRes {
   AssetsRes._();
 
   static const String PLUGIN_NAME = 'mekanik';
-  static const String PLUGIN_VERSION = '1.5.2+1';
+  static const String PLUGIN_VERSION = '2.0.9+1';
   static const String BG = 'assets/bg.png';
   static const String BGABSEN = 'assets/bgabsen.png';
   static const String LOGO_TECH = 'assets/logo_tech.png';
+  static const String NO_SIGNAL = 'assets/no_signal.png';
   static const String SOUNDS = 'assets/sounds/sounds.mp3';
   static const String SOUNDS_BOOKING = 'assets/sounds/sounds_booking.mp3';
 }

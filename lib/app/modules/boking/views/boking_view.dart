@@ -427,8 +427,29 @@ class _BokingView2State extends State<BokingView2> {
                     child: Loadingshammer(),
                   );
                 } else if (snapshot.hasError) {
-                  return SingleChildScrollView(
-                    child: Loadingshammer(),
+                  return Container(
+                    height: 500,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/no_signal.png',
+                          width: 100.0,
+                          height: 100.0,
+                          fit: BoxFit.cover,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          'Jaringan bermasalah / tidak ada jaringan\nTarik kebawah untuk Refresh halaman',
+                          style: TextStyle(
+                              color: MyColors.appPrimaryColor,
+                              fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
                   );
                 } else if (snapshot.hasData) {
                   Boking getDataAcc = snapshot.data!;

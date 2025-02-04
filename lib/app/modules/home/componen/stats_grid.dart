@@ -83,7 +83,7 @@ class _StatsGridState extends State<StatsGrid> {
                   future: API.BookingMasukID(),
                   color: Colors.orange,
                   onTapRoute: Routes.BOOKINGMASUK,
-                  dataLabel: "Booking Masuk",
+                  dataLabel: "Jumlah Booking",
                 ),
                 _buildFutureStatCard<ServiceSelesaiHome>(
                   future: API.ServiceSelesaiID(),

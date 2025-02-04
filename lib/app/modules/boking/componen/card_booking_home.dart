@@ -205,7 +205,7 @@ class BokingListHome extends StatelessWidget {
 
               const SizedBox(height: 12),
               const Text(
-                'Detail Kendaraan',
+                'Detail Kendaraan Pelanggan',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,

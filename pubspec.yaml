@@ -1,5 +1,5 @@
 name: mekanik
-version: 1.5.2+1
+version: 2.0.9+1
 publish_to: none
 description: A new Flutter project.
 environment: 
@@ -94,6 +94,7 @@ flutter:
     - assets/bgabsen.png
     - assets/icons/
     - assets/logo_tech.png
+    - assets/no_signal.png
     - assets/sounds/sounds.mp3
     - assets/sounds/sounds_booking.mp3
 

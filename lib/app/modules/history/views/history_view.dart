@@ -15,13 +15,15 @@ import '../controllers/history_controller.dart';
 class HistoryView2 extends StatefulWidget {
   final VoidCallback clearCachedBooking;
 
-  const HistoryView2({Key? key, required this.clearCachedBooking}) : super(key: key);
+  const HistoryView2({Key? key, required this.clearCachedBooking})
+      : super(key: key);
 
   @override
   _HistoryView2State createState() => _HistoryView2State();
 }
 
-class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderStateMixin {
+class _HistoryView2State extends State<HistoryView2>
+    with SingleTickerProviderStateMixin {
   final controller = Get.put(HistoryController());
   late TabController _tabController;
   String selectedService = 'Repair & Maintenance';
@@ -31,13 +33,21 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
   String selectedServicetb = 'Tire/ Ban';
   late List<RefreshController> _refreshControllers;
   String selectedStatus = 'Semua';
-  List<String> statusOptions = ['Semua', 'ESTIMASI', 'PKB', 'PKB TUTUP', 'INVOICE'];
+  List<String> statusOptions = [
+    'Semua',
+    'ESTIMASI',
+    'PKB',
+    'PKB TUTUP',
+    'INVOICE'
+  ];
   @override
   void initState() {
     _tabController = TabController(length: 5, vsync: this);
     _tabController.addListener(_handleTabSelection);
     _refreshControllers = List.generate(
-        5, (index) => RefreshController()); // Adjust the number of RefreshControllers according to the number of tabs
+        5,
+        (index) =>
+            RefreshController()); // Adjust the number of RefreshControllers according to the number of tabs
     super.initState();
   }
 
@@ -53,11 +63,11 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
         return 'Repair & Maintenance';
       case 1:
         return 'General Check UP/P2H';
-        case 2:
+      case 2:
         return 'Periodical Maintenance';
-        case 3:
+      case 3:
         return 'Warranty';
-        case 4:
+      case 4:
         return 'Tire/ Ban';
       default:
         return 'Repair & Maintenance';
@@ -96,7 +106,8 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset('assets/logo_tech.png',
+              Image.asset(
+                'assets/logo_tech.png',
                 height: 45,
               ),
             ],
@@ -114,62 +125,62 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
 
                   if (data != null && data.isNotEmpty) {
                     return InkWell(
-                      onTap: () => showSearch(
-                        context: context,
-                        delegate: SearchPage<DataHistory>(
-                          items: data,
-                          searchLabel: 'Search History Booking',
-                          searchStyle: TextStyle(color: Colors.black),
-                          showItemsOnEmpty: true,
-                          failure: Center(
-                            child: Text(
-                              'History Not Found :(',
-                              style: TextStyle(),
+                        onTap: () => showSearch(
+                              context: context,
+                              delegate: SearchPage<DataHistory>(
+                                items: data,
+                                searchLabel: 'Search History Booking',
+                                searchStyle: TextStyle(color: Colors.black),
+                                showItemsOnEmpty: true,
+                                failure: Center(
+                                  child: Text(
+                                    'History Not Found :(',
+                                    style: TextStyle(),
+                                  ),
+                                ),
+                                filter: (booking) => [
+                                  booking.nama,
+                                  booking.noPolisi,
+                                  booking.status,
+                                  booking.createdByPkb,
+                                  booking.createdBy,
+                                  booking.tglEstimasi,
+                                  booking.tipeSvc,
+                                  booking.kodeEstimasi,
+                                ],
+                                builder: (items) => HistoryList(
+                                    items: items,
+                                    onTap: () {
+                                      handleBookingTap(items);
+                                    }),
+                              ),
                             ),
-                          ),
-                          filter: (booking) => [
-                            booking.nama,
-                            booking.noPolisi,
-                            booking.status,
-                            booking.createdByPkb,
-                            booking.createdBy,
-                            booking.tglEstimasi,
-                            booking.tipeSvc,
-                            booking.kodeEstimasi,
-                          ],
-                          builder: (items) =>
-                              HistoryList(items: items,
-                                  onTap: () {
-                                    handleBookingTap(items);
-                                  }),
-                        ),
-                      ),
-                      child: Container(
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.15),
-                                spreadRadius: 5,
-                                blurRadius: 10,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.search_rounded,
-                                color: MyColors.appPrimaryColor,
-                              ),
-                              SizedBox(width: 10,),
-                              Text('Pencarian')
-                            ],
-                          )
-                      )
-                    );
+                        child: Container(
+                            padding: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.15),
+                                  spreadRadius: 5,
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.search_rounded,
+                                  color: MyColors.appPrimaryColor,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text('Pencarian')
+                              ],
+                            )));
                   } else {
                     return Center(
                       child: Text(
@@ -190,9 +201,9 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
           bottom: TabBar(
             controller: _tabController,
             labelColor:
-            MyColors.appPrimaryColor, // Change label color as needed
+                MyColors.appPrimaryColor, // Change label color as needed
             unselectedLabelColor:
-            Colors.grey, // Change unselected label color as needed
+                Colors.grey, // Change unselected label color as needed
             indicatorColor: MyColors.appPrimaryColor,
             tabs: const [
               Tab(
@@ -231,7 +242,9 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
   Widget _buildTabContent(String tabService) {
     return Column(
       children: [
-        SizedBox(height: 10,),
+        SizedBox(
+          height: 10,
+        ),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 10),
           margin: EdgeInsets.symmetric(horizontal: 20),
@@ -280,10 +293,34 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
                     FutureBuilder(
                       future: API.HistoryID(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const LoadingshammerHistory();
                         } else if (snapshot.hasError) {
-                          return LoadingshammerHistory();
+                          return Container(
+                            height: 500,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/no_signal.png',
+                                  width: 100.0,
+                                  height: 100.0,
+                                  fit: BoxFit.cover,
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  'Jaringan bermasalah / tidak ada jaringan\nTarik kebawah untuk Refresh halaman',
+                                  style: TextStyle(
+                                      color: MyColors.appPrimaryColor,
+                                      fontWeight: FontWeight.bold),
+                                )
+                              ],
+                            ),
+                          );
                         } else if (snapshot.hasData) {
                           final data = snapshot.data!.dataHistory ?? [];
                           List<DataHistory> filteredData = [];
@@ -295,49 +332,52 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
                           } else {
                             filteredData = data
                                 .where((item) =>
-                            item.status == selectedStatus &&
-                                item.tipeSvc == tabService)
+                                    item.status == selectedStatus &&
+                                    item.tipeSvc == tabService)
                                 .toList();
                           }
 
                           return filteredData.isEmpty
                               ? Container(
-                            height: 500,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  'assets/icons/booking.png',
-                                  width: 100.0,
-                                  height: 100.0,
-                                  fit: BoxFit.cover,
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  'Belum ada data History',
-                                  style: TextStyle(
-                                      color: MyColors.appPrimaryColor,
-                                      fontWeight: FontWeight.bold),
+                                  height: 500,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        'assets/icons/booking.png',
+                                        width: 100.0,
+                                        height: 100.0,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        'Belum ada data History',
+                                        style: TextStyle(
+                                            color: MyColors.appPrimaryColor,
+                                            fontWeight: FontWeight.bold),
+                                      )
+                                    ],
+                                  ),
                                 )
-                              ],
-                            ),
-                          )
                               : Column(
-                            children: filteredData.map((e) => HistoryList(
-                              items: e,
-                              onTap: () {
-                                Get.toNamed(
-                                  Routes.DETAIL_HISTORY,
-                                  arguments: {
-                                    'kode_svc': e.kodeSvc ?? '',
-                                  },
+                                  children: filteredData
+                                      .map((e) => HistoryList(
+                                            items: e,
+                                            onTap: () {
+                                              Get.toNamed(
+                                                Routes.DETAIL_HISTORY,
+                                                arguments: {
+                                                  'kode_svc': e.kodeSvc ?? '',
+                                                },
+                                              );
+                                            },
+                                          ))
+                                      .toList(),
                                 );
-                              },
-                            )).toList(),
-                          );
                         } else {
                           return const Center(
                             child: Text('History tidak ada'),
@@ -345,7 +385,6 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
                         }
                       },
                     ),
-
                   ],
                 ),
               ),
@@ -384,5 +423,4 @@ class _HistoryView2State extends State<HistoryView2> with SingleTickerProviderSt
         return 0;
     }
   }
-
 }

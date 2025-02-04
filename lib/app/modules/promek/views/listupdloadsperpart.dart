@@ -6,18 +6,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mekanik/app/componen/color.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:search_page/search_page.dart';
-import '../../../componen/loading_cabang_shimmer.dart';
-import '../../../componen/loading_search_shimmer.dart';
-import '../../../componen/loading_search_shimmerpkb.dart';
+
 import '../../../componen/loading_shammer_booking.dart';
-import '../../../componen/loading_shammer_history.dart';
-import '../../../data/data_endpoint/pkb.dart';
-import '../../../data/data_endpoint/profile.dart';
 import '../../../data/data_endpoint/uploadperpart.dart';
 import '../../../data/endpoint.dart';
 import '../../../data/localstorage.dart';
 import '../../../routes/app_pages.dart';
-import '../componen/card_pkb.dart';
 import '../componen/card_uploadperpart.dart';
 
 class PKBUploadlist extends StatefulWidget {
@@ -140,105 +134,91 @@ class _PKBUploadlistState extends State<PKBUploadlist>
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return
-      Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          forceMaterialTransparency: true,
-          title: FutureBuilder(
-            future: API.ListSperpartID(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Container(
-                  width: double.infinity,
-                  margin: EdgeInsets.only(top: 10, bottom: 10),
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.15),
-                        spreadRadius: 5,
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(children: [
-                    SizedBox(width: 10,),
-                    Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
-                    SizedBox(width: 10,),
-                    Text('Pencarian List Sperepart',  style: TextStyle(fontSize: 14, color: MyColors.appPrimaryColor),)
-                  ],),
-                );
-              } else if (snapshot.hasData && snapshot.data != null) {
-                final data = snapshot.data!.dataPhotosparepart;
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        forceMaterialTransparency: true,
+        title: FutureBuilder(
+          future: API.ListSperpartID(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Container(
+                width: double.infinity,
+                margin: EdgeInsets.only(top: 10, bottom: 10),
+                padding: EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.15),
+                      spreadRadius: 5,
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Icon(
+                      Icons.search_rounded,
+                      color: MyColors.appPrimaryColor,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'Pencarian List Sperepart',
+                      style: TextStyle(
+                          fontSize: 14, color: MyColors.appPrimaryColor),
+                    )
+                  ],
+                ),
+              );
+            } else if (snapshot.hasData && snapshot.data != null) {
+              final data = snapshot.data!.dataPhotosparepart;
 
-                if (data != null && data.isNotEmpty) {
-                  return InkWell(
-                    onTap: () => showSearch(
-                      context: context,
-                      delegate: SearchPage<DataPhotosparepart>(
-                        items: data,
-                        searchLabel: 'Pencarian List Sperepart',
-                        searchStyle: GoogleFonts.nunito(color: Colors.black),
-                        showItemsOnEmpty: true,
-                        failure: Center(
-                          child: Text(
-                            'Pencarian List Sperepart Tidak Dtemukan :(',
-                            style: GoogleFonts.nunito(),
-                          ),
-                        ),
-                        filter: (booking) => [
-                          booking.nama,
-                          booking.noPolisi,
-                          booking.createdByPkb,
-                          booking.createdBy,
-                          booking.tglEstimasi,
-                          booking.tipeSvc,
-                          booking.kodePkb,
-                          booking.kodePelanggan,
-                        ],
-                        builder: (items) => pkblistSperpart(
-                          items: items,
-                          onTap: () {
-                            handleBookingTap(items);
-                          },
+              if (data != null && data.isNotEmpty) {
+                return InkWell(
+                  onTap: () => showSearch(
+                    context: context,
+                    delegate: SearchPage<DataPhotosparepart>(
+                      items: data,
+                      searchLabel: 'Pencarian List Sperepart',
+                      searchStyle: GoogleFonts.nunito(color: Colors.black),
+                      showItemsOnEmpty: true,
+                      failure: Center(
+                        child: Text(
+                          'Pencarian List Sperepart Tidak Dtemukan :(',
+                          style: GoogleFonts.nunito(),
                         ),
                       ),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      margin: EdgeInsets.only(top: 10, bottom: 10),
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.15),
-                            spreadRadius: 5,
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
+                      filter: (booking) => [
+                        booking.nama,
+                        booking.noPolisi,
+                        booking.createdByPkb,
+                        booking.createdBy,
+                        booking.tglEstimasi,
+                        booking.tipeSvc,
+                        booking.kodePkb,
+                        booking.kodePelanggan,
+                      ],
+                      builder: (items) => PkbListSperpart(
+                        items: items,
+                        onTap: () {
+                          handleBookingTap(items);
+                        },
                       ),
-                      child: Row(children: [
-                        SizedBox(width: 10,),
-                        Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
-                        SizedBox(width: 10,),
-                        Text('Pencarian List Sperepart',  style: TextStyle(fontSize: 14, color: Colors.black54),)
-                      ],),
                     ),
-                  );
-                } else {
-                  return Container(
+                  ),
+                  child: Container(
                     width: double.infinity,
                     margin: EdgeInsets.only(top: 10, bottom: 10),
                     padding: EdgeInsets.symmetric(vertical: 10),
@@ -254,14 +234,26 @@ class _PKBUploadlistState extends State<PKBUploadlist>
                         ),
                       ],
                     ),
-                    child: Row(children: [
-                      SizedBox(width: 10,),
-                      Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
-                      SizedBox(width: 10,),
-                      Text('Pencarian List Sperepart',  style: TextStyle(fontSize: 14, color: Colors.black54),)
-                    ],),
-                  );
-                }
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Icon(
+                          Icons.search_rounded,
+                          color: MyColors.appPrimaryColor,
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          'Pencarian List Sperepart',
+                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                        )
+                      ],
+                    ),
+                  ),
+                );
               } else {
                 return Container(
                   width: double.infinity,
@@ -279,103 +271,159 @@ class _PKBUploadlistState extends State<PKBUploadlist>
                       ),
                     ],
                   ),
-                  child: Row(children: [
-                    SizedBox(width: 10,),
-                    Icon(Icons.search_rounded, color: MyColors.appPrimaryColor,),
-                    SizedBox(width: 10,),
-                    Text('Pencarian List Sperepart',  style: TextStyle(fontSize: 14, color: MyColors.appPrimaryColor),)
-                  ],),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Icon(
+                        Icons.search_rounded,
+                        color: MyColors.appPrimaryColor,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Pencarian List Sperepart',
+                        style: TextStyle(fontSize: 14, color: Colors.black54),
+                      )
+                    ],
+                  ),
                 );
               }
-            },
-          ),
-        ),
-        body: SmartRefresher(
-          controller: _refreshController,
-          enablePullDown: true,
-          header: const WaterDropHeader(),
-          onLoading: _onLoading,
-          onRefresh: _onRefresh,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                FutureBuilder(
-                  future: API.ListSperpartID(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: Loadingshammer());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Loadingshammer());
-                    } else if (!snapshot.hasData ||
-                        (snapshot.data as UploadSpertpart).dataPhotosparepart == null ||
-                        (snapshot.data as UploadSpertpart).dataPhotosparepart!.isEmpty) {
-                      return Container(
-                        height: 500,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/icons/booking.png',
-                              width: 100.0,
-                              height: 100.0,
-                              fit: BoxFit.cover,
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              'Belum ada data Foto Sperepart',
-                              style: TextStyle(
-                                  color: MyColors.appPrimaryColor,
-                                  fontWeight: FontWeight.bold),
-                            )
-                          ],
-                        ),
-                      );
-                    } else {
-                      UploadSpertpart getDataAcc = snapshot.data as UploadSpertpart;
-                      List<DataPhotosparepart> sortedDataPKB =
-                      getDataAcc.dataPhotosparepart!.toList();
-                      sortedDataPKB.sort((a, b) {
-                        int extractNumber(String kodePkb) {
-                          RegExp regex = RegExp(r'(\d+)$');
-                          Match? match = regex.firstMatch(kodePkb);
-                          return match != null ? int.parse(match.group(0)!) : 0;
-                        }
-
-                        int aNumber = extractNumber(a.kodePkb ?? '');
-                        int bNumber = extractNumber(b.kodePkb ?? '');
-                        return bNumber.compareTo(aNumber);
-                      });
-
-                      return Column(
-                        children: AnimationConfiguration.toStaggeredList(
-                          duration: const Duration(milliseconds: 475),
-                          childAnimationBuilder: (widget) => SlideAnimation(
-                            child: FadeInAnimation(
-                              child: widget,
-                            ),
-                          ),
-                          children: sortedDataPKB.map((e) {
-                            return pkblistSperpart(
-                              items: e,
-                              onTap: () {
-                                handleBookingTap(e);
-                              },
-                            );
-                          }).toList(),
-                        ),
-                      );
-                    }
-                  },
+            } else {
+              return Container(
+                width: double.infinity,
+                margin: EdgeInsets.only(top: 10, bottom: 10),
+                padding: EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.15),
+                      spreadRadius: 5,
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 170,)
-              ],
-            ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Icon(
+                      Icons.search_rounded,
+                      color: MyColors.appPrimaryColor,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'Pencarian List Sperepart',
+                      style: TextStyle(
+                          fontSize: 14, color: MyColors.appPrimaryColor),
+                    )
+                  ],
+                ),
+              );
+            }
+          },
+        ),
+      ),
+      body: SmartRefresher(
+        controller: _refreshController,
+        enablePullDown: true,
+        header: const WaterDropHeader(),
+        onLoading: _onLoading,
+        onRefresh: _onRefresh,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              FutureBuilder(
+                future: API.ListSperpartID(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: Loadingshammer());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Loadingshammer());
+                  } else if (!snapshot.hasData ||
+                      (snapshot.data as UploadSpertpart).dataPhotosparepart ==
+                          null ||
+                      (snapshot.data as UploadSpertpart)
+                          .dataPhotosparepart!
+                          .isEmpty) {
+                    return Container(
+                      height: 500,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/icons/booking.png',
+                            width: 100.0,
+                            height: 100.0,
+                            fit: BoxFit.cover,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            'Belum ada data Foto Sperepart',
+                            style: TextStyle(
+                                color: MyColors.appPrimaryColor,
+                                fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                    );
+                  } else {
+                    UploadSpertpart getDataAcc =
+                        snapshot.data as UploadSpertpart;
+                    List<DataPhotosparepart> sortedDataPKB =
+                        getDataAcc.dataPhotosparepart!.toList();
+                    sortedDataPKB.sort((a, b) {
+                      int extractNumber(String kodePkb) {
+                        RegExp regex = RegExp(r'(\d+)$');
+                        Match? match = regex.firstMatch(kodePkb);
+                        return match != null ? int.parse(match.group(0)!) : 0;
+                      }
+
+                      int aNumber = extractNumber(a.kodePkb ?? '');
+                      int bNumber = extractNumber(b.kodePkb ?? '');
+                      return bNumber.compareTo(aNumber);
+                    });
+
+                    return Column(
+                      children: AnimationConfiguration.toStaggeredList(
+                        duration: const Duration(milliseconds: 475),
+                        childAnimationBuilder: (widget) => SlideAnimation(
+                          child: FadeInAnimation(
+                            child: widget,
+                          ),
+                        ),
+                        children: sortedDataPKB.map((e) {
+                          return PkbListSperpart(
+                            items: e,
+                            onTap: () {
+                              handleBookingTap(e);
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }
+                },
+              ),
+              SizedBox(
+                height: 170,
+              )
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 
   _onLoading() {
@@ -395,4 +443,3 @@ class _PKBUploadlistState extends State<PKBUploadlist>
     Get.offAllNamed(Routes.SIGNIN);
   }
 }
-

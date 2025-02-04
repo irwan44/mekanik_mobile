@@ -16,7 +16,6 @@ import '../../../data/data_endpoint/boking.dart';
 import '../../../data/data_endpoint/profile.dart';
 import '../../../data/endpoint.dart';
 import '../../../routes/app_pages.dart';
-import '../../../tester/tester_kategori.dart';
 import '../componen/card_booking.dart';
 import '../controllers/boking_controller.dart';
 
@@ -42,7 +41,7 @@ class _BokingViewState extends State<BokingView> {
 
 class BokingView2 extends StatefulWidget {
   final VoidCallback
-  clearCachedBoking; // Menggunakan VoidCallback untuk tipe fungsi tanpa parameter
+      clearCachedBoking; // Menggunakan VoidCallback untuk tipe fungsi tanpa parameter
 
   const BokingView2({super.key, required this.clearCachedBoking});
 
@@ -58,6 +57,7 @@ class _BokingView2State extends State<BokingView2> {
     _refreshControllers = List.generate(14, (index) => RefreshController());
     super.initState();
   }
+
   Future<void> handleBookingTap(DataBooking e) async {
     HapticFeedback.lightImpact();
     if (kDebugMode) {
@@ -129,15 +129,13 @@ class _BokingView2State extends State<BokingView2> {
         final generalData = await API.kategoriID();
         String kategoriKendaraanId = '';
         if (generalData != null) {
-          final matchingKategori = generalData
-              .dataKategoriKendaraan
+          final matchingKategori = generalData.dataKategoriKendaraan
               ?.where((kategori) =>
-          kategori.kategoriKendaraan == e.kategoriKendaraan)
+                  kategori.kategoriKendaraan == e.kategoriKendaraan)
               .firstOrNull;
           if (matchingKategori != null &&
               matchingKategori is DataKategoriKendaraan) {
-            kategoriKendaraanId =
-                matchingKategori.kategoriKendaraanId ?? '';
+            kategoriKendaraanId = matchingKategori.kategoriKendaraanId ?? '';
           }
         }
         Get.toNamed(
@@ -172,11 +170,14 @@ class _BokingView2State extends State<BokingView2> {
         final generalData = await API.kategoriID();
         String kategoriKendaraanId = '';
         if (generalData != null) {
-          final matchingKategori = generalData.dataKategoriKendaraan?.firstWhere(
-                (kategori) => kategori.kategoriKendaraan == e.kategoriKendaraan,
-            orElse: () => DataKategoriKendaraan(kategoriKendaraanId: '', kategoriKendaraan: ''),
+          final matchingKategori =
+              generalData.dataKategoriKendaraan?.firstWhere(
+            (kategori) => kategori.kategoriKendaraan == e.kategoriKendaraan,
+            orElse: () => DataKategoriKendaraan(
+                kategoriKendaraanId: '', kategoriKendaraan: ''),
           );
-          if (matchingKategori != null && matchingKategori is DataKategoriKendaraan) {
+          if (matchingKategori != null &&
+              matchingKategori is DataKategoriKendaraan) {
             kategoriKendaraanId = matchingKategori.kategoriKendaraanId ?? '';
           }
         }
@@ -213,14 +214,14 @@ class _BokingView2State extends State<BokingView2> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 12,
       child: Scaffold(
+        backgroundColor: Colors.grey[100],
         appBar: AppBar(
-          automaticallyImplyLeading: false,
+          // automaticallyImplyLeading: false,
           surfaceTintColor: Colors.transparent,
           centerTitle: false,
           toolbarHeight: 60,
@@ -285,41 +286,42 @@ class _BokingView2State extends State<BokingView2> {
                   if (data != null && data.isNotEmpty) {
                     return InkWell(
                         onTap: () => showSearch(
-                          context: context,
-                          delegate: SearchPage<DataBooking>(
-                            items: data,
-                            searchLabel: 'Cari Booking',
-                            searchStyle: GoogleFonts.nunito(color: Colors.black),
-                            showItemsOnEmpty: true,
-                            failure: Center(
-                              child: Text(
-                                'Booking Tidak Ditemukan :(',
-                                style: GoogleFonts.nunito(),
+                              context: context,
+                              delegate: SearchPage<DataBooking>(
+                                items: data,
+                                searchLabel: 'Cari Booking',
+                                searchStyle:
+                                    GoogleFonts.nunito(color: Colors.black),
+                                showItemsOnEmpty: true,
+                                failure: Center(
+                                  child: Text(
+                                    'Booking Tidak Ditemukan :(',
+                                    style: GoogleFonts.nunito(),
+                                  ),
+                                ),
+                                filter: (booking) => [
+                                  booking.nama,
+                                  booking.noPolisi,
+                                  booking.bookingStatus,
+                                  booking.namaMerk,
+                                  booking.alamat,
+                                  booking.bookingStatus,
+                                  booking.namaService,
+                                  booking.namaCabang,
+                                  booking.jamBooking,
+                                  booking.kodeKendaraan,
+                                  booking.namaTipe,
+                                  booking.vinNumber,
+                                  booking.transmisi,
+                                ],
+                                builder: (booking) => BokingList(
+                                  items: booking,
+                                  onTap: () {
+                                    handleBookingTap(booking);
+                                  },
+                                ),
                               ),
                             ),
-                            filter: (booking) => [
-                              booking.nama,
-                              booking.noPolisi,
-                              booking.bookingStatus,
-                              booking.namaMerk,
-                              booking.alamat,
-                              booking.bookingStatus,
-                              booking.namaService,
-                              booking.namaCabang,
-                              booking.jamBooking,
-                              booking.kodeKendaraan,
-                              booking.namaTipe,
-                              booking.vinNumber,
-                              booking.transmisi,
-                            ],
-                            builder: (booking) => BokingList(
-                              items: booking,
-                              onTap: () {
-                                handleBookingTap(booking);
-                              },
-                            ),
-                          ),
-                        ),
                         child: Container(
                             padding: EdgeInsets.all(5),
                             decoration: BoxDecoration(
@@ -340,12 +342,12 @@ class _BokingView2State extends State<BokingView2> {
                                   Icons.search_rounded,
                                   color: MyColors.appPrimaryColor,
                                 ),
-                                SizedBox(width: 10,),
+                                SizedBox(
+                                  width: 10,
+                                ),
                                 Text('Pencarian')
                               ],
-                            )
-                        )
-                    );
+                            )));
                   } else {
                     return Center(
                       child: Text(
@@ -366,9 +368,9 @@ class _BokingView2State extends State<BokingView2> {
           bottom: TabBar(
             isScrollable: true,
             labelColor:
-            MyColors.appPrimaryColor, // Change label color as needed
+                MyColors.appPrimaryColor, // Change label color as needed
             unselectedLabelColor:
-            Colors.grey, // Change unselected label color as needed
+                Colors.grey, // Change unselected label color as needed
             indicatorColor: MyColors.appPrimaryColor,
             tabs: const [
               Tab(text: 'Semua'),
@@ -390,7 +392,6 @@ class _BokingView2State extends State<BokingView2> {
           children: [
             _buildTabContent(null),
             _buildTabContent('booking'),
-
             _buildTabContent('approve'),
             _buildTabContent('diproses'),
             _buildTabContent('estimasi'),
@@ -464,8 +465,9 @@ class _BokingView2State extends State<BokingView2> {
                   // Filter data berdasarkan status
                   List<DataBooking> filteredList = status != null
                       ? getDataAcc.dataBooking!
-                      .where((item) => item.bookingStatus!.toLowerCase() == status)
-                      .toList()
+                          .where((item) =>
+                              item.bookingStatus!.toLowerCase() == status)
+                          .toList()
                       : getDataAcc.dataBooking!;
 
                   // Sort data berdasarkan tgl_booking dan jam_booking dari terbaru ke terlama
@@ -474,13 +476,15 @@ class _BokingView2State extends State<BokingView2> {
                     DateTime? bDateTime;
 
                     try {
-                      aDateTime = DateTime.parse('${a.tglBooking} ${a.jamBooking}');
+                      aDateTime =
+                          DateTime.parse('${a.tglBooking} ${a.jamBooking}');
                     } catch (e) {
                       aDateTime = null;
                     }
 
                     try {
-                      bDateTime = DateTime.parse('${b.tglBooking} ${b.jamBooking}');
+                      bDateTime =
+                          DateTime.parse('${b.tglBooking} ${b.jamBooking}');
                     } catch (e) {
                       bDateTime = null;
                     }
@@ -531,26 +535,39 @@ class _BokingView2State extends State<BokingView2> {
                           child: widget,
                         ),
                       ),
-                      children: filteredList.map(
+                      children: filteredList
+                          .map(
                             (e) => BokingList(
-                          items: e,
+                                items: e,
                                 onTap: () async {
                                   HapticFeedback.lightImpact();
                                   if (kDebugMode) {
-                                    print('Nilai e.namaService: ${e.namaService ?? ''}');
+                                    print(
+                                        'Nilai e.namaService: ${e.namaService ?? ''}');
                                   }
 
-                                  if (e.bookingStatus != null && e.namaService != null) {
+                                  if (e.bookingStatus != null &&
+                                      e.namaService != null) {
                                     String kategoriKendaraanId = '';
                                     final generalData = await API.kategoriID();
                                     if (generalData != null) {
-                                      final matchingKategori = generalData.dataKategoriKendaraan?.firstWhere(
-                                            (kategori) => kategori.kategoriKendaraan == e.kategoriKendaraan,
-                                        orElse: () => DataKategoriKendaraan(kategoriKendaraanId: '', kategoriKendaraan: ''),
+                                      final matchingKategori = generalData
+                                          .dataKategoriKendaraan
+                                          ?.firstWhere(
+                                        (kategori) =>
+                                            kategori.kategoriKendaraan ==
+                                            e.kategoriKendaraan,
+                                        orElse: () => DataKategoriKendaraan(
+                                            kategoriKendaraanId: '',
+                                            kategoriKendaraan: ''),
                                       );
 
-                                      if (matchingKategori != null && matchingKategori is DataKategoriKendaraan) {
-                                        kategoriKendaraanId = matchingKategori.kategoriKendaraanId ?? '';
+                                      if (matchingKategori != null &&
+                                          matchingKategori
+                                              is DataKategoriKendaraan) {
+                                        kategoriKendaraanId = matchingKategori
+                                                .kategoriKendaraanId ??
+                                            '';
                                       }
                                     }
 
@@ -567,8 +584,10 @@ class _BokingView2State extends State<BokingView2> {
                                       'keluhan': e.keluhan ?? '',
                                       'pm_opt': e.pmopt ?? '',
                                       'type_order': e.typeOrder ?? '',
-                                      'kategori_kendaraan': e.kategoriKendaraan ?? '',
-                                      'kategori_kendaraan_id': kategoriKendaraanId,
+                                      'kategori_kendaraan':
+                                          e.kategoriKendaraan ?? '',
+                                      'kategori_kendaraan_id':
+                                          kategoriKendaraanId,
                                       'warna': e.warna ?? '',
                                       'hp': e.hp ?? '',
                                       'vin_number': e.vinNumber ?? '',
@@ -580,43 +599,73 @@ class _BokingView2State extends State<BokingView2> {
                                       'status': e.bookingStatus ?? '',
                                     };
 
-                                    if (e.bookingStatus!.toLowerCase() == 'booking') {
-                                      Get.toNamed(Routes.APPROVE, arguments: arguments);
-                                    } else if (e.bookingStatus!.toLowerCase() == 'approve') {
-                                      if (e.typeOrder != null && e.typeOrder!.toLowerCase() == 'emergency service') {
-                                        arguments['location'] = e.location ?? '';
-                                        arguments['location_name'] = e.locationname ?? '';
-                                        Get.toNamed(Routes.EmergencyView, arguments: arguments);
+                                    if (e.bookingStatus!.toLowerCase() ==
+                                        'booking') {
+                                      Get.toNamed(Routes.APPROVE,
+                                          arguments: arguments);
+                                    } else if (e.bookingStatus!.toLowerCase() ==
+                                        'approve') {
+                                      if (e.typeOrder != null &&
+                                          e.typeOrder!.toLowerCase() ==
+                                              'emergency service') {
+                                        arguments['location'] =
+                                            e.location ?? '';
+                                        arguments['location_name'] =
+                                            e.locationname ?? '';
+                                        Get.toNamed(Routes.EmergencyView,
+                                            arguments: arguments);
                                       } else {
-                                        if (e.namaService!.toLowerCase() == 'repair & maintenance') {
-                                          Get.toNamed(Routes.REPAIR_MAINTENEN, arguments: arguments);
-                                        } else if (e.namaService!.toLowerCase() == 'periodical maintenance') {
-                                          Get.toNamed(Routes.StarStopProdical, arguments: arguments);
-                                        } else if (e.namaService!.toLowerCase() == 'tire/ ban') {
-                                          Get.toNamed(Routes.REPAIR_MAINTENEN, arguments: arguments);
-                                        } else if (e.namaService!.toLowerCase() == 'general check up/p2h') {
-                                          Get.toNamed(Routes.GENERAL_CHECKUP, arguments: arguments);
+                                        if (e.namaService!.toLowerCase() ==
+                                            'repair & maintenance') {
+                                          Get.toNamed(Routes.REPAIR_MAINTENEN,
+                                              arguments: arguments);
+                                        } else if (e.namaService!
+                                                .toLowerCase() ==
+                                            'periodical maintenance') {
+                                          Get.toNamed(Routes.StarStopProdical,
+                                              arguments: arguments);
+                                        } else if (e.namaService!
+                                                .toLowerCase() ==
+                                            'tire/ ban') {
+                                          Get.toNamed(Routes.REPAIR_MAINTENEN,
+                                              arguments: arguments);
+                                        } else if (e.namaService!
+                                                .toLowerCase() ==
+                                            'general check up/p2h') {
+                                          Get.toNamed(Routes.GENERAL_CHECKUP,
+                                              arguments: arguments);
                                         }
                                       }
-                                    } else if (e.bookingStatus!.toLowerCase() == 'diproses') {
-                                      if (e.namaService!.toLowerCase() == 'general check up/p2h') {
-                                        Get.toNamed(Routes.GENERAL_CHECKUP, arguments: arguments);
-                                      } else if (e.namaService!.toLowerCase() == 'periodical maintenance') {
-                                        Get.toNamed(Routes.StarStopProdical,
+                                    } else if (e.bookingStatus!.toLowerCase() ==
+                                        'diproses') {
+                                      if (e.namaService!.toLowerCase() ==
+                                          'general check up/p2h') {
+                                        Get.toNamed(Routes.GENERAL_CHECKUP,
+                                            arguments: arguments);
+                                      } else if (e.namaService!.toLowerCase() ==
+                                          'periodical maintenance') {
+                                        Get.toNamed(
+                                          Routes.StarStopProdical,
                                           arguments: {
                                             'tgl_booking': e.tglBooking ?? '',
-                                            'booking_id': e.bookingId.toString(),
+                                            'booking_id':
+                                                e.bookingId.toString(),
                                             'jam_booking': e.jamBooking ?? '',
                                             'nama': e.nama ?? '',
                                             'kode_booking': e.kodeBooking ?? '',
-                                            'kode_kendaraan': e.kodeKendaraan ?? '',
-                                            'kode_pelanggan': e.kodePelanggan ?? '',
-                                            'nama_jenissvc': e.namaService ?? '',
+                                            'kode_kendaraan':
+                                                e.kodeKendaraan ?? '',
+                                            'kode_pelanggan':
+                                                e.kodePelanggan ?? '',
+                                            'nama_jenissvc':
+                                                e.namaService ?? '',
                                             'no_polisi': e.noPolisi ?? '',
                                             'tahun': e.tahun ?? '',
                                             'keluhan': e.keluhan ?? '',
-                                            'kategori_kendaraan': e.kategoriKendaraan ?? '',
-                                            'kategori_kendaraan_id': kategoriKendaraanId,
+                                            'kategori_kendaraan':
+                                                e.kategoriKendaraan ?? '',
+                                            'kategori_kendaraan_id':
+                                                kategoriKendaraanId,
                                             'warna': e.warna ?? '',
                                             'ho': e.hp ?? '',
                                             'pm_opt': e.pmopt ?? '',
@@ -639,11 +688,12 @@ class _BokingView2State extends State<BokingView2> {
                                       );
                                     }
                                   } else {
-                                    print('Booking status atau namaService bernilai null');
+                                    print(
+                                        'Booking status atau namaService bernilai null');
                                   }
-                                }
-                            ),
-                      ).toList(),
+                                }),
+                          )
+                          .toList(),
                     ),
                   );
                 } else {

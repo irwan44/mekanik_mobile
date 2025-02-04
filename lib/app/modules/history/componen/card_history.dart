@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:mekanik/app/componen/color.dart';
+
 import '../../../data/data_endpoint/history.dart';
-import 'detail_sheet.dart';
 
 class HistoryList extends StatelessWidget {
   final DataHistory items;
   final VoidCallback onTap;
 
-  const HistoryList({Key? key, required this.items, required this.onTap});
+  const HistoryList({Key? key, required this.items, required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,16 +17,16 @@ class HistoryList extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.15),
-              spreadRadius: 5,
-              blurRadius: 10,
+              spreadRadius: 3,
+              blurRadius: 6,
               offset: const Offset(0, 3),
             ),
           ],
@@ -35,82 +34,28 @@ class HistoryList extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Tipe Service
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Tipe Service'),
-                    Text(
-                      items.tipeSvc ?? "-",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                // Status
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: statusColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        items.status.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                _buildInfoItem(Icons.car_repair, 'Tipe Service', items.tipeSvc),
+                _buildStatusBadge(statusColor, items.status ?? 'Unknown'),
               ],
             ),
             const Divider(color: Colors.grey),
-            // Menampilkan tanggal-tanggal dengan GridView
             _buildDateGrid(context),
             const SizedBox(height: 10),
-            // Pelanggan dan Kode Estimasi
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Pelanggan'),
-                    Text(
-                      items.nama ?? "-",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Text('Kode estimasi'),
-                    Text(
-                      items.kodeEstimasi.toString(),
-                      style: const TextStyle(
-                        color: Colors.green,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+                _buildInfoItem(Icons.person, 'Pelanggan', items.nama),
+                _buildInfoItem(Icons.receipt, 'Kode Estimasi',
+                    items.kodeEstimasi.toString(),
+                    color: Colors.green),
               ],
             ),
             const SizedBox(height: 10),
-            // PIC Estimasi
-            const Text('PIC Estimasi'),
-            Text(
-              items.createdBy ?? "-",
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            _buildInfoItem(
+                Icons.assignment_ind, 'PIC Estimasi', items.createdBy),
             const SizedBox(height: 10),
           ],
         ),
@@ -118,156 +63,90 @@ class HistoryList extends StatelessWidget {
     );
   }
 
-  // Helper function untuk membuat grid tanggal
-  Widget _buildDateGrid(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    int crossAxisCount = width > 600 ? 12 : 4; // Menyesuaikan jumlah kolom berdasarkan lebar layar
-
-    return GridView.count(
-      shrinkWrap: true,
-      crossAxisCount: crossAxisCount,
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 9,
-      physics: NeverScrollableScrollPhysics(),
+  Widget _buildInfoItem(IconData icon, String label, String? value,
+      {Color color = Colors.black}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDateContainer('Tgl Estimasi', items.tglEstimasi ?? 'Tgl Estimasi', context),
-        _buildDateContainer('Tgl PKB', items.tglPkb ?? 'Tgl PKB Tidak ada', context),
-        _buildDateContainerblue('Tgl Kembali', items.tglKembali ?? 'Tgl Kembali Tidak ada', context),
-        _buildDateContainergreen('Tgl Keluar', items.tglKeluar ?? 'Tgl Keluar Tidak ada', context),
-        _buildDateContainerred('Tgl Tutup', items.tglTutup ?? 'Tgl Tutup Tidak ada', context),
+        Row(
+          children: [
+            Icon(icon, size: 16, color: Colors.grey),
+            const SizedBox(width: 5),
+            Text(label,
+                style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          ],
+        ),
+        Text(
+          value ?? '-',
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 14, color: color),
+        ),
       ],
     );
   }
 
-  // Helper function untuk membuat kontainer tanggal
-  Widget _buildDateContainer(String label, String value, BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double containerHeight;
-
-    // Menyesuaikan tinggi kontainer berdasarkan lebar layar
-    if (width < 600) {
-      // Untuk mobile, beri tinggi lebih besar agar terlihat lebih jelas
-      containerHeight = 100;
-    } else {
-      // Untuk tablet/desktop, beri tinggi lebih kecil
-      containerHeight = 20;
-    }
-
+  Widget _buildStatusBadge(Color color, String status) {
     return Container(
-      padding: const EdgeInsets.all(10),
-      height: containerHeight, // Menyesuaikan height berdasarkan device
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.orange,
-        borderRadius: BorderRadius.circular(10),
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        status,
+        style:
+            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildDateGrid(BuildContext context) {
+    List<Map<String, dynamic>> dateItems = [
+      {
+        'label': 'Tgl Estimasi',
+        'value': items.tglEstimasi,
+        'color': Colors.orange
+      },
+      {'label': 'Tgl PKB', 'value': items.tglPkb, 'color': Colors.blueGrey},
+      {'label': 'Tgl Kembali', 'value': items.tglKembali, 'color': Colors.blue},
+      {'label': 'Tgl Keluar', 'value': items.tglKeluar, 'color': Colors.green},
+      {'label': 'Tgl Tutup', 'value': items.tglTutup, 'color': Colors.red},
+    ];
+
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: dateItems
+          .map((date) =>
+              _buildDateContainer(date['label'], date['value'], date['color']))
+          .toList(),
+    );
+  }
+
+  Widget _buildDateContainer(String label, String? value, Color color) {
+    return Container(
+      width: 100,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // Centerkan konten di dalam container
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 10)),
+          Text(label,
+              style: const TextStyle(color: Colors.white, fontSize: 10)),
+          const SizedBox(height: 5),
           Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 10),
+            value ?? '-',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.white, fontSize: 12),
           ),
         ],
       ),
     );
   }
-}
-Widget _buildDateContainerblue(String label, String value, BuildContext context) {
-  double width = MediaQuery.of(context).size.width;
-  double containerHeight;
-
-  // Menyesuaikan tinggi kontainer berdasarkan lebar layar
-  if (width < 600) {
-    // Untuk mobile, beri tinggi lebih besar agar terlihat lebih jelas
-    containerHeight = 100;
-  } else {
-    // Untuk tablet/desktop, beri tinggi lebih kecil
-    containerHeight = 20;
-  }
-
-  return Container(
-    padding: const EdgeInsets.all(10),
-    height: containerHeight, // Menyesuaikan height berdasarkan device
-    decoration: BoxDecoration(
-      color: Colors.green,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center, // Centerkan konten di dalam container
-      children: [
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 10)),
-        Text(
-          value,
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 10),
-        ),
-      ],
-    ),
-  );
-}
-Widget _buildDateContainerred(String label, String value, BuildContext context) {
-  double width = MediaQuery.of(context).size.width;
-  double containerHeight;
-
-  // Menyesuaikan tinggi kontainer berdasarkan lebar layar
-  if (width < 600) {
-    // Untuk mobile, beri tinggi lebih besar agar terlihat lebih jelas
-    containerHeight = 100;
-  } else {
-    // Untuk tablet/desktop, beri tinggi lebih kecil
-    containerHeight = 20;
-  }
-
-  return Container(
-    padding: const EdgeInsets.all(10),
-    height: containerHeight, // Menyesuaikan height berdasarkan device
-    decoration: BoxDecoration(
-      color: Colors.red,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center, // Centerkan konten di dalam container
-      children: [
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 10)),
-        Text(
-          value,
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 10),
-        ),
-      ],
-    ),
-  );
-}
-Widget _buildDateContainergreen(String label, String value, BuildContext context) {
-  double width = MediaQuery.of(context).size.width;
-  double containerHeight;
-
-  // Menyesuaikan tinggi kontainer berdasarkan lebar layar
-  if (width < 600) {
-    // Untuk mobile, beri tinggi lebih besar agar terlihat lebih jelas
-    containerHeight = 100;
-  } else {
-    // Untuk tablet/desktop, beri tinggi lebih kecil
-    containerHeight = 20;
-  }
-
-  return Container(
-    padding: const EdgeInsets.all(10),
-    height: containerHeight, // Menyesuaikan height berdasarkan device
-    decoration: BoxDecoration(
-      color: Colors.blue,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center, // Centerkan konten di dalam container
-      children: [
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 10)),
-        Text(
-          value,
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 10),
-        ),
-      ],
-    ),
-  );
 }
 
 class StatusColor {
@@ -288,7 +167,7 @@ class StatusColor {
       case 'selesai dikerjakan':
         return Colors.green;
       default:
-        return Colors.transparent;
+        return Colors.grey;
     }
   }
 }

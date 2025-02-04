@@ -6,7 +6,9 @@ import '../../../componen/loading_cabang_shimmer.dart';
 import '../../../data/data_endpoint/profile.dart';
 import '../../../data/endpoint.dart';
 import 'listupdloadsperpart.dart';
+
 const double borderRadius = 25.0;
+
 class StackOver extends StatefulWidget {
   @override
   _StackOverState createState() => _StackOverState();
@@ -14,7 +16,6 @@ class StackOver extends StatefulWidget {
 
 class _StackOverState extends State<StackOver>
     with SingleTickerProviderStateMixin {
-
   late PageController _pageController;
   int activePageIndex = 0;
 
@@ -33,14 +34,57 @@ class _StackOverState extends State<StackOver>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        extendBodyBehindAppBar: false,
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          automaticallyImplyLeading: false,
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: Colors.white,
           forceMaterialTransparency: true,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset('assets/logo_tech.png',
-                height: 45,
+              Text(
+                'PKB Service',
+                style: TextStyle(
+                    color: MyColors.appPrimaryColor,
+                    fontWeight: FontWeight.bold),
+              ),
+              FutureBuilder<Profile>(
+                future: API.profileiD(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const loadcabang();
+                  } else if (snapshot.hasError) {
+                    return const Text(
+                      'tidak ada koneksi',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  } else {
+                    if (snapshot.data != null) {
+                      final cabang = snapshot.data!.data?.cabang ?? "";
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            cabang,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return const loadcabang();
+                    }
+                  }
+                },
               ),
             ],
           ),
@@ -104,14 +148,19 @@ class _StackOverState extends State<StackOver>
                 width: MediaQuery.of(context).size.width,
                 padding: EdgeInsets.symmetric(vertical: 0),
                 alignment: Alignment.center,
-                decoration: (activePageIndex == 0) ? BoxDecoration(
-                  color:  MyColors.appPrimaryColor,
-                  borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
-
-                ) : null,
+                decoration: (activePageIndex == 0)
+                    ? BoxDecoration(
+                        color: MyColors.appPrimaryColor,
+                        borderRadius:
+                            BorderRadius.all(Radius.circular(borderRadius)),
+                      )
+                    : null,
                 child: Text(
                   "PKB Service",
-                  style: (activePageIndex == 0) ? TextStyle(color: Colors.white) : TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+                  style: (activePageIndex == 0)
+                      ? TextStyle(color: Colors.white)
+                      : TextStyle(
+                          color: Colors.black54, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -124,13 +173,20 @@ class _StackOverState extends State<StackOver>
                 width: MediaQuery.of(context).size.width,
                 padding: EdgeInsets.symmetric(vertical: 0),
                 alignment: Alignment.center,
-                decoration: (activePageIndex == 1) ? BoxDecoration(
-                  color:  MyColors.appPrimaryColor,
-                  borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
-                ) : null,
+                decoration: (activePageIndex == 1)
+                    ? BoxDecoration(
+                        color: MyColors.appPrimaryColor,
+                        borderRadius:
+                            BorderRadius.all(Radius.circular(borderRadius)),
+                      )
+                    : null,
                 child: Text(
                   "Upload Foto Sparepart",
-                  style: (activePageIndex == 1) ? TextStyle(color: Colors.white, fontWeight: FontWeight.bold) : TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+                  style: (activePageIndex == 1)
+                      ? TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)
+                      : TextStyle(
+                          color: Colors.black54, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -149,5 +205,4 @@ class _StackOverState extends State<StackOver>
     _pageController.animateToPage(1,
         duration: const Duration(milliseconds: 500), curve: Curves.decelerate);
   }
-
 }

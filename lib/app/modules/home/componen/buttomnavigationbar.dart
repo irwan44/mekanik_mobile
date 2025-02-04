@@ -9,9 +9,8 @@ import 'package:mekanik/app/modules/history/views/history_view.dart';
 import 'package:mekanik/app/modules/profile/views/profile_view.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+
 import '../../../data/data_endpoint/boking.dart';
-import '../../boking/views/boking_view.dart';
-import '../../promek/views/view.dart';
 import '../views/home_view.dart';
 
 class HomeView extends StatefulWidget {
@@ -58,68 +57,68 @@ class _HomeViewState extends State<HomeView> {
         bottomNavigationBar: isTablet
             ? null
             : CurvedNavigationBar(
-          key: _bottomNavigationKey,
-          index: _page,
-          items: const [
-            CurvedNavigationBarItem(
-              child: Icon(
-                Icons.home_outlined,
-                color: Colors.white,
+                key: _bottomNavigationKey,
+                index: _page,
+                items: const [
+                  CurvedNavigationBarItem(
+                    child: Icon(
+                      Icons.home_outlined,
+                      color: Colors.white,
+                    ),
+                    label: 'Home',
+                    labelStyle: TextStyle(color: Colors.white),
+                  ),
+                  // CurvedNavigationBarItem(
+                  //   child: Icon(
+                  //     Icons.timer,
+                  //     color: Colors.white,
+                  //   ),
+                  //   label: 'PKB',
+                  //   labelStyle: TextStyle(color: Colors.white),
+                  // ),
+                  // CurvedNavigationBarItem(
+                  //   child: Icon(
+                  //     Icons.calendar_month_rounded,
+                  //     color: Colors.white,
+                  //   ),
+                  //   label: 'Booking',
+                  //   labelStyle: TextStyle(color: Colors.white),
+                  // ),
+                  CurvedNavigationBarItem(
+                    child: Icon(
+                      Icons.history,
+                      color: Colors.white,
+                    ),
+                    label: 'History',
+                    labelStyle: TextStyle(color: Colors.white),
+                  ),
+                  CurvedNavigationBarItem(
+                    child: Icon(
+                      Icons.portrait_outlined,
+                      color: Colors.white,
+                    ),
+                    label: 'Profile',
+                    labelStyle: TextStyle(color: Colors.white),
+                  ),
+                ],
+                color: MyColors.appPrimaryColor,
+                buttonBackgroundColor: MyColors.appPrimaryColor,
+                backgroundColor: Colors.white,
+                animationCurve: Curves.linear,
+                animationDuration: const Duration(milliseconds: 600),
+                onTap: (index) {
+                  HapticFeedback.lightImpact();
+                  setState(() {
+                    _page = index;
+                    _pageController.animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.linear,
+                    );
+                  });
+                },
+                letIndexChange: (index) => true,
               ),
-              label: 'Home',
-              labelStyle: TextStyle(color: Colors.white),
-            ),
-            CurvedNavigationBarItem(
-              child: Icon(
-                Icons.timer,
-                color: Colors.white,
-              ),
-              label: 'PKB',
-              labelStyle: TextStyle(color: Colors.white),
-            ),
-            CurvedNavigationBarItem(
-              child: Icon(
-                Icons.calendar_month_rounded,
-                color: Colors.white,
-              ),
-              label: 'Booking',
-              labelStyle: TextStyle(color: Colors.white),
-            ),
-            CurvedNavigationBarItem(
-              child: Icon(
-                Icons.history,
-                color: Colors.white,
-              ),
-              label: 'History',
-              labelStyle: TextStyle(color: Colors.white),
-            ),
-            CurvedNavigationBarItem(
-              child: Icon(
-                Icons.portrait_outlined,
-                color: Colors.white,
-              ),
-              label: 'Profile',
-              labelStyle: TextStyle(color: Colors.white),
-            ),
-          ],
-          color: MyColors.appPrimaryColor,
-          buttonBackgroundColor: MyColors.appPrimaryColor,
-          backgroundColor: Colors.white,
-          animationCurve: Curves.linear,
-          animationDuration: const Duration(milliseconds: 600),
-          onTap: (index) {
-            HapticFeedback.lightImpact();
-            setState(() {
-              _page = index;
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.linear,
-              );
-            });
-          },
-          letIndexChange: (index) => true,
-        ),
         body: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -147,8 +146,11 @@ class _HomeViewState extends State<HomeView> {
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
                         decoration: BoxDecoration(
-                          color: isSelected ? Colors.white : MyColors.appPrimaryColor, // Background color
-                          borderRadius: BorderRadius.circular(12), // Radius rounded
+                          color: isSelected
+                              ? Colors.white
+                              : MyColors.appPrimaryColor, // Background color
+                          borderRadius:
+                              BorderRadius.circular(12), // Radius rounded
                         ),
                         padding: const EdgeInsets.all(12.0),
                         child: Column(
@@ -156,13 +158,17 @@ class _HomeViewState extends State<HomeView> {
                           children: [
                             Icon(
                               _getIcon(index),
-                              color: isSelected ? MyColors.appPrimaryColor : Colors.white, // Icon color
+                              color: isSelected
+                                  ? MyColors.appPrimaryColor
+                                  : Colors.white, // Icon color
                             ),
                             SizedBox(height: 4),
                             Text(
                               _getTitle(index),
                               style: TextStyle(
-                                color: isSelected ? MyColors.appPrimaryColor : Colors.white, // Text color
+                                color: isSelected
+                                    ? MyColors.appPrimaryColor
+                                    : Colors.white, // Text color
                               ),
                             ),
                           ],
@@ -183,8 +189,8 @@ class _HomeViewState extends State<HomeView> {
                 },
                 children: <Widget>[
                   HomePage(),
-                  StackOver(),
-                  BokingView(),
+                  // StackOver(),
+                  // BokingView(),
                   HistoryView2(clearCachedBooking: clearCachedBoking),
                   ProfileView(),
                 ],

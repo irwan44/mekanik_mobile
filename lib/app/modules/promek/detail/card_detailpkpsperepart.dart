@@ -1,19 +1,21 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+
 import '../../../componen/color.dart';
 import '../../../data/data_endpoint/detailsperpart.dart';
 import '../../../data/endpoint.dart';
 import '../../../data/publik.dart';
 import 'imagedetail/imagedetail.dart';
-import 'package:http/http.dart' as http;
 
 class CardDetailPKBSperepart extends StatefulWidget {
   const CardDetailPKBSperepart({Key? key}) : super(key: key);
@@ -32,7 +34,12 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
   String kodeSparepart = '';
 
   void _showPicker(
-      BuildContext context, String title, String photoType, String? namaSparepart, String? kodeSparepart,) {
+    BuildContext context,
+    String title,
+    String photoType,
+    String? namaSparepart,
+    String? kodeSparepart,
+  ) {
     showModalBottomSheet(
       showDragHandle: true,
       backgroundColor: Colors.white,
@@ -115,14 +122,17 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       },
     );
   }
-  Future<void> _pickImages(String sourceType, String photoType, String? kodeSparepart) async {
+
+  Future<void> _pickImages(
+      String sourceType, String photoType, String? kodeSparepart) async {
     try {
       List<XFile>? images;
 
       if (sourceType == 'Gallery') {
         images = await _picker.pickMultiImage();
       } else if (sourceType == 'Camera') {
-        final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+        final XFile? image =
+            await _picker.pickImage(source: ImageSource.camera);
         if (image != null) {
           images = [image];
         }
@@ -151,20 +161,23 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
           if (photoType == 'Before') {
             AddedImageBefor addedImage = AddedImageBefor(
               id: id,
-              kodeSparepart: kodeSparepart ?? '', // Default to empty string if kodeSparepart is null
+              kodeSparepart: kodeSparepart ??
+                  '', // Default to empty string if kodeSparepart is null
               file: compressedXFile, // Use the compressed XFile
             );
             _addedImagesBefore.add(addedImage);
           } else if (photoType == 'After') {
             AddedImageAfter addedImage = AddedImageAfter(
               id: id,
-              kodeSparepart: kodeSparepart ?? '', // Default to empty string if kodeSparepart is null
+              kodeSparepart: kodeSparepart ??
+                  '', // Default to empty string if kodeSparepart is null
               file: compressedXFile, // Use the compressed XFile
             );
             _addedImagesAfter.add(addedImage);
           }
 
-          await _uploadImage(compressedFile, kodeSparepart ?? '', kodePkb, photoType); // Pass empty string if kodeSparepart is null
+          await _uploadImage(compressedFile, kodeSparepart ?? '', kodePkb,
+              photoType); // Pass empty string if kodeSparepart is null
 
           print('Selected image path: ${compressedFile.path}');
         }
@@ -187,7 +200,8 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
 
     // Determine the output format based on the file extension
     CompressFormat format;
-    if (filePath.toLowerCase().endsWith('.jpg') || filePath.toLowerCase().endsWith('.jpeg')) {
+    if (filePath.toLowerCase().endsWith('.jpg') ||
+        filePath.toLowerCase().endsWith('.jpeg')) {
       format = CompressFormat.jpeg;
     } else if (filePath.toLowerCase().endsWith('.png')) {
       format = CompressFormat.png;
@@ -197,7 +211,8 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       throw UnsupportedError('Unsupported file format');
     }
 
-    final outPath = "${filePath.substring(0, filePath.lastIndexOf('.'))}_compressed${filePath.substring(filePath.lastIndexOf('.'))}";
+    final outPath =
+        "${filePath.substring(0, filePath.lastIndexOf('.'))}_compressed${filePath.substring(filePath.lastIndexOf('.'))}";
 
     final result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
@@ -212,15 +227,14 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       throw Exception('Image compression failed');
     }
 
-
     return File(result.path);
   }
 
-
-
-  Future<void> _uploadImage(File imageFile, String kodeSparepart, String kodePkb, String photoType) async {
+  Future<void> _uploadImage(File imageFile, String kodeSparepart,
+      String kodePkb, String photoType) async {
     final token = Publics.controller.getToken.value ?? ''; // Get the token
-    final url = Uri.parse('https://api.realauto.co.id/api/mekanik/insert-photosparepart');
+    final url = Uri.parse(
+        'https://apps-mobile.techthinkhub.com/api/mekanik/insert-photosparepart');
     final request = http.MultipartRequest('POST', url);
 
     request.headers['Authorization'] = 'Bearer $token';
@@ -229,7 +243,9 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
     request.fields['kode_pkb'] = kodePkb;
     request.fields['dtl_kode_sparepart'] = kodeSparepart;
 
-    int imageCount = photoType == 'Before' ? _addedImagesBefore.length : _addedImagesAfter.length;
+    int imageCount = photoType == 'Before'
+        ? _addedImagesBefore.length
+        : _addedImagesAfter.length;
 
     request.fields['baris_dtl'] = imageCount.toString();
 
@@ -260,8 +276,10 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       final UploadSpertpart1 = await API.DetailSpertpartID(kodesvc: kodeSvc);
       setState(() {
         if (UploadSpertpart1?.dataPhotosparepart != null) {
-          svcId = UploadSpertpart1.dataPhotosparepart!.dataSvc!.svcId.toString();
-          kodePkb = UploadSpertpart1.dataPhotosparepart!.dataSvc!.kodePkb.toString();
+          svcId =
+              UploadSpertpart1.dataPhotosparepart!.dataSvc!.svcId.toString();
+          kodePkb =
+              UploadSpertpart1.dataPhotosparepart!.dataSvc!.kodePkb.toString();
           print('svcId: $svcId'); // Ensure svcId is correctly set here
         } else {
           svcId = '';
@@ -271,22 +289,25 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       print('Error fetching absen info: $e');
     }
   }
+
   @override
   void initState() {
     _refreshController = RefreshController();
-    final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
+    final Map<String, dynamic>? arguments =
+        Get.arguments as Map<String, dynamic>?;
     final String kodeSvc = arguments?['kode_svc'] ?? '';
     _fetchAbsenInfo(kodeSvc);
     super.initState();
   }
 
   void _reloadData() {
-    setState(() {
-    });
+    setState(() {});
   }
+
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic>? arguments = Get.arguments as Map<String, dynamic>?;
+    final Map<String, dynamic>? arguments =
+        Get.arguments as Map<String, dynamic>?;
     final String kodeSvc = arguments?['kode_svc'] ?? '';
     print(arguments);
 
@@ -300,7 +321,9 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
           statusBarBrightness: Brightness.light,
           systemNavigationBarColor: Colors.white,
         ),
-        title: Text('Detail', style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.appPrimaryColor)),
+        title: Text('Detail',
+            style: TextStyle(
+                fontWeight: FontWeight.bold, color: MyColors.appPrimaryColor)),
         centerTitle: false,
       ),
       body: SmartRefresher(
@@ -319,8 +342,10 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else if (snapshot.hasData) {
                 final dataSvc = snapshot.data!.dataPhotosparepart?.dataSvc;
-                final dataSvcDtlJasa = snapshot.data!.dataPhotosparepart!.detailSparepart;
-                final photoSparepart = snapshot.data!.dataPhotosparepart!.photoSparepart;
+                final dataSvcDtlJasa =
+                    snapshot.data!.dataPhotosparepart!.detailSparepart;
+                final photoSparepart =
+                    snapshot.data!.dataPhotosparepart!.photoSparepart;
 
                 return Container(
                   width: double.infinity,
@@ -341,7 +366,11 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('${dataSvc?.tipeSvc}', style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.appPrimaryColor, fontSize: 15)),
+                      Text('${dataSvc?.tipeSvc}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: MyColors.appPrimaryColor,
+                              fontSize: 15)),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(10),
@@ -369,14 +398,18 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     const Text('Tanggal & Jam Estimasi :'),
-                                    Text('${dataSvc?.tglEstimasi??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    Text('${dataSvc?.tglEstimasi ?? '-'}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
                                   ],
                                 ),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     const Text('Jam Selesai'),
-                                    Text('${dataSvc?.jamSelesai ?? '-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    Text('${dataSvc?.jamSelesai ?? '-'}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
                                   ],
                                 ),
                               ],
@@ -412,14 +445,18 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     const Text('Tanggal & Jam PKB :'),
-                                    Text('${dataSvc?.tglPkb??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    Text('${dataSvc?.tglPkb ?? '-'}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
                                   ],
                                 ),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     const Text('Jam Selesai'),
-                                    Text('${dataSvc?.jamSelesai ?? '-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    Text('${dataSvc?.jamSelesai ?? '-'}',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
                                   ],
                                 ),
                               ],
@@ -436,14 +473,19 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text('Cabang'),
-                              Text('${dataSvc?.namaCabang??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${dataSvc?.namaCabang ?? '-'}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
                             ],
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               const Text('Kode Estimasi'),
-                              Text('${dataSvc?.kodeEstimasi??'-'}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                              Text('${dataSvc?.kodeEstimasi ?? '-'}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green)),
                             ],
                           ),
                         ],
@@ -457,28 +499,39 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text('Tipe Pelanggan :'),
-                              Text('${dataSvc?.tipePelanggan ?? '-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${dataSvc?.tipePelanggan ?? '-'}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
                             ],
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               const Text('Kode PKB'),
-                              Text('${dataSvc?.kodePkb??'-'}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                              Text('${dataSvc?.kodePkb ?? '-'}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green)),
                             ],
                           ),
                         ],
                       ),
                       const Divider(color: Colors.grey),
                       const SizedBox(height: 10),
-                      Text('Detail Pelanggan', style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.appPrimaryColor)),
+                      Text('Detail Pelanggan',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: MyColors.appPrimaryColor)),
                       const SizedBox(height: 10),
                       _buildInfoRow('Nama :', dataSvc?.nama ?? ''),
                       _buildInfoRow('No Handphone :', dataSvc?.hp ?? ''),
                       _buildInfoRow('Alamat :', dataSvc?.alamat ?? ''),
                       const Divider(color: Colors.grey),
                       const SizedBox(height: 10),
-                      Text('Kendaraan Pelanggan', style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.appPrimaryColor)),
+                      Text('Kendaraan Pelanggan',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: MyColors.appPrimaryColor)),
                       const SizedBox(height: 10),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -488,17 +541,18 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text('Merk :'),
-                              Text('${dataSvc?.namaMerk??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${dataSvc?.namaMerk ?? '-'}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
                             ],
                           ),
-
                           Flexible(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 const Text('Tipe :'),
                                 Text(
-                                  dataSvc?.namaTipe??'-',
+                                  dataSvc?.namaTipe ?? '-',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     overflow: TextOverflow.ellipsis,
@@ -507,7 +561,8 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                 ),
                               ],
                             ),
-                          )],
+                          )
+                        ],
                       ),
                       const SizedBox(height: 5),
                       Row(
@@ -518,14 +573,18 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text('Tahun :'),
-                              Text('${dataSvc?.tahun??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${dataSvc?.tahun ?? '-'}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
                             ],
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               const Text('Warna :'),
-                              Text('${dataSvc?.warna??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${dataSvc?.warna ?? '-'}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ],
@@ -534,9 +593,12 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text('Odometer :'),
-                          Text('${dataSvc?.odometer??'-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Text('${dataSvc?.odometer ?? '-'}',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
                         ],
-                      ),Row(
+                      ),
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -544,14 +606,19 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text('No Polisi :'),
-                              Text('${dataSvc?.noPolisi}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text('${dataSvc?.noPolisi}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
                             ],
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               const Text('Vin Number :'),
-                              Text('${dataSvc?.vinNumber??'belum ada Vin Number'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text(
+                                  '${dataSvc?.vinNumber ?? 'belum ada Vin Number'}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ],
@@ -559,7 +626,11 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                       const SizedBox(height: 5),
                       const Divider(color: Colors.grey),
                       const SizedBox(height: 10),
-                      Text('Sparepart', style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.appPrimaryColor, fontSize: 18)),
+                      Text('Sparepart',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: MyColors.appPrimaryColor,
+                              fontSize: 18)),
                       Column(
                         children: [
                           Column(
@@ -570,51 +641,69 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    for (int index = 0; index < (dataSvcDtlJasa?.length ?? 0); index++)
+                                    for (int index = 0;
+                                        index < (dataSvcDtlJasa?.length ?? 0);
+                                        index++)
                                       Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Flexible(
                                                 child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
                                                       '${dataSvcDtlJasa?[index].namaSparepart}',
-                                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
                                                     ),
                                                     Text(
                                                       '${dataSvcDtlJasa?[index].kodeSparepart}',
-                                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                               Column(
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
                                                 children: [
                                                   const Text('Harga :'),
                                                   Text(
                                                     'Rp. ${NumberFormat('#,##0', 'id_ID').format(dataSvcDtlJasa?[index].hargaSparepart ?? 0)}',
-                                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
                                                   ),
                                                 ],
                                               ),
                                             ],
                                           ),
                                           SizedBox(height: 5),
-                                          Text('Kode Sparepart:  ${dataSvcDtlJasa?[index].kodeSparepart}',
+                                          Text(
+                                              'Kode Sparepart:  ${dataSvcDtlJasa?[index].kodeSparepart}',
                                               style: TextStyle(
                                                 fontSize: 14,
                                               )),
                                           SizedBox(height: 5),
-                                          Text('QTY:  ${dataSvcDtlJasa?[index].qtySparepart}',
+                                          Text(
+                                              'QTY:  ${dataSvcDtlJasa?[index].qtySparepart}',
                                               style: TextStyle(
                                                 fontSize: 14,
                                               )),
@@ -623,16 +712,24 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                             Column(
                                               children: [
                                                 Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
                                                         SizedBox(height: 10),
                                                         Text(
                                                           'Before Photos :',
-                                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
                                                         ),
                                                       ],
                                                     ),
@@ -641,18 +738,26 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                           context,
                                                           'Before ',
                                                           'Before',
-                                                          dataSvcDtlJasa?[index].namaSparepart,
-                                                          dataSvcDtlJasa?[index].kodeSparepart),
-                                                      style: ElevatedButton.styleFrom(
-                                                        backgroundColor: MyColors.appPrimaryColor,
-                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                                          dataSvcDtlJasa?[index]
+                                                              .namaSparepart,
+                                                          dataSvcDtlJasa?[index]
+                                                              .kodeSparepart),
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor: MyColors
+                                                            .appPrimaryColor,
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20)),
                                                         elevation: 0,
-
                                                       ),
                                                       child: const Text(
                                                         'Upload Photo Before',
                                                         style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                           color: Colors.white,
                                                           fontSize: 12,
                                                         ),
@@ -661,56 +766,122 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                   ],
                                                 ),
                                                 if (getBeforePhotos(
-                                                    photoSparepart,
-                                                    dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                    dataSvcDtlJasa?[index].kodeSparepart ?? "")
+                                                        photoSparepart,
+                                                        dataSvcDtlJasa?[index]
+                                                                .namaSparepart ??
+                                                            "",
+                                                        dataSvcDtlJasa?[index]
+                                                                .kodeSparepart ??
+                                                            "")
                                                     .isNotEmpty)
                                                   Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
-                                                      const SizedBox(height: 10),
+                                                      const SizedBox(
+                                                          height: 10),
                                                       SizedBox(
                                                         height: 120,
-                                                        child:ListView.builder(
-                                                          scrollDirection: Axis.horizontal,
+                                                        child: ListView.builder(
+                                                          scrollDirection:
+                                                              Axis.horizontal,
                                                           itemCount: getBeforePhotos(
-                                                              photoSparepart,
-                                                              dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                              dataSvcDtlJasa?[index].kodeSparepart ?? ""
-                                                          ).length + _addedImagesBefore.where((img) => img.kodeSparepart == dataSvcDtlJasa?[index].kodeSparepart).length,
-                                                          itemBuilder: (context, photoIndex) {
-                                                            if (photoIndex < getBeforePhotos(
-                                                                photoSparepart,
-                                                                dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                                dataSvcDtlJasa?[index].kodeSparepart ?? ""
-                                                            ).length) {
+                                                                      photoSparepart,
+                                                                      dataSvcDtlJasa?[index]
+                                                                              .namaSparepart ??
+                                                                          "",
+                                                                      dataSvcDtlJasa?[index]
+                                                                              .kodeSparepart ??
+                                                                          "")
+                                                                  .length +
+                                                              _addedImagesBefore
+                                                                  .where((img) =>
+                                                                      img.kodeSparepart ==
+                                                                      dataSvcDtlJasa?[
+                                                                              index]
+                                                                          .kodeSparepart)
+                                                                  .length,
+                                                          itemBuilder: (context,
+                                                              photoIndex) {
+                                                            if (photoIndex <
+                                                                getBeforePhotos(
+                                                                        photoSparepart,
+                                                                        dataSvcDtlJasa?[index].namaSparepart ??
+                                                                            "",
+                                                                        dataSvcDtlJasa?[index].kodeSparepart ??
+                                                                            "")
+                                                                    .length) {
                                                               // Display existing photos
-                                                              final List<PhotoSparepart> photos = getBeforePhotos(
-                                                                  photoSparepart,
-                                                                  dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                                  dataSvcDtlJasa?[index].kodeSparepart ?? ""
-                                                              );
-                                                              final String imageUrl = photos[photoIndex].photoUrl ?? '';
-                                                              final String photoId = photos[photoIndex].id.toString();
-                                                              final String kodesparepart = photos[photoIndex].kodeSparepart ?? '';
+                                                              final List<
+                                                                      PhotoSparepart>
+                                                                  photos =
+                                                                  getBeforePhotos(
+                                                                      photoSparepart,
+                                                                      dataSvcDtlJasa?[index]
+                                                                              .namaSparepart ??
+                                                                          "",
+                                                                      dataSvcDtlJasa?[index]
+                                                                              .kodeSparepart ??
+                                                                          "");
+                                                              final String
+                                                                  imageUrl =
+                                                                  photos[photoIndex]
+                                                                          .photoUrl ??
+                                                                      '';
+                                                              final String
+                                                                  photoId =
+                                                                  photos[photoIndex]
+                                                                      .id
+                                                                      .toString();
+                                                              final String
+                                                                  kodesparepart =
+                                                                  photos[photoIndex]
+                                                                          .kodeSparepart ??
+                                                                      '';
 
                                                               // Ensure only network images are shown
-                                                              if (imageUrl.startsWith('http')) {
-                                                                return buildPhotoWidget(imageUrl, photoId, kodesparepart);
+                                                              if (imageUrl
+                                                                  .startsWith(
+                                                                      'http')) {
+                                                                return buildPhotoWidget(
+                                                                    imageUrl,
+                                                                    photoId,
+                                                                    kodesparepart);
                                                               }
                                                               return SizedBox(); // Return an empty widget if the condition is not met
                                                             } else {
                                                               // Display newly added images filtered by kodeSparepart
-                                                              final List<AddedImageBefor> filteredAddedImages = _addedImagesBefore.where((img) => img.kodeSparepart == dataSvcDtlJasa?[index].kodeSparepart).toList();
-                                                              final AddedImageBefor addedImage = filteredAddedImages[photoIndex - getBeforePhotos(
-                                                                  photoSparepart,
-                                                                  dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                                  dataSvcDtlJasa?[index].kodeSparepart ?? ""
-                                                              ).length];
+                                                              final List<
+                                                                      AddedImageBefor>
+                                                                  filteredAddedImages =
+                                                                  _addedImagesBefore
+                                                                      .where((img) =>
+                                                                          img.kodeSparepart ==
+                                                                          dataSvcDtlJasa?[index]
+                                                                              .kodeSparepart)
+                                                                      .toList();
+                                                              final AddedImageBefor
+                                                                  addedImage =
+                                                                  filteredAddedImages[photoIndex -
+                                                                      getBeforePhotos(
+                                                                              photoSparepart,
+                                                                              dataSvcDtlJasa?[index].namaSparepart ?? "",
+                                                                              dataSvcDtlJasa?[index].kodeSparepart ?? "")
+                                                                          .length];
 
-                                                              final String imageUrl = addedImage.file.path; // Adjust based on how XFile is stored
-                                                              final String photoId = addedImage.id;
-                                                              final String kodeSparepart = addedImage.kodeSparepart; // Get kodeSparepart from AddedImage
+                                                              final String
+                                                                  imageUrl =
+                                                                  addedImage
+                                                                      .file
+                                                                      .path; // Adjust based on how XFile is stored
+                                                              final String
+                                                                  photoId =
+                                                                  addedImage.id;
+                                                              final String
+                                                                  kodeSparepart =
+                                                                  addedImage
+                                                                      .kodeSparepart; // Get kodeSparepart from AddedImage
 
                                                               // Return an empty widget as we are hiding local file images
                                                               return SizedBox();
@@ -721,17 +892,24 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                     ],
                                                   ),
                                                 Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
                                                         SizedBox(height: 10),
                                                         Text(
                                                           'After Photos :',
                                                           style: TextStyle(
-                                                              fontWeight: FontWeight.bold),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
                                                         ),
                                                       ],
                                                     ),
@@ -740,18 +918,26 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                           context,
                                                           'After ',
                                                           'After',
-                                                          dataSvcDtlJasa?[index].namaSparepart,
-                                                          dataSvcDtlJasa?[index].kodeSparepart),
-                                                      style: ElevatedButton.styleFrom(
-                                                        backgroundColor: MyColors.appPrimaryColor,
+                                                          dataSvcDtlJasa?[index]
+                                                              .namaSparepart,
+                                                          dataSvcDtlJasa?[index]
+                                                              .kodeSparepart),
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor: MyColors
+                                                            .appPrimaryColor,
                                                         shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(20)),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20)),
                                                         elevation: 0,
                                                       ),
                                                       child: const Text(
                                                         'Upload Photo After',
                                                         style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
+                                                          fontWeight:
+                                                              FontWeight.bold,
                                                           color: Colors.white,
                                                           fontSize: 12,
                                                         ),
@@ -760,56 +946,132 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                                                   ],
                                                 ),
                                                 if (getAfterPhotos(
-                                                    photoSparepart,
-                                                    dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                    dataSvcDtlJasa?[index].kodeSparepart ?? "")
+                                                        photoSparepart,
+                                                        dataSvcDtlJasa?[index]
+                                                                .namaSparepart ??
+                                                            "",
+                                                        dataSvcDtlJasa?[index]
+                                                                .kodeSparepart ??
+                                                            "")
                                                     .isNotEmpty)
                                                   Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
-                                                      const SizedBox(height: 10),
+                                                      const SizedBox(
+                                                          height: 10),
                                                       SizedBox(
                                                         height: 120,
-                                                        child:ListView.builder(
-                                                          scrollDirection: Axis.horizontal,
-                                                          itemCount: getAfterPhotos(
-                                                            photoSparepart,
-                                                            dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                            dataSvcDtlJasa?[index].kodeSparepart ?? "",
-                                                          ).length + _addedImagesAfter.where((img) => img.kodeSparepart == dataSvcDtlJasa?[index].kodeSparepart).length,
-                                                          itemBuilder: (context, photoIndex) {
-                                                            if (photoIndex < getAfterPhotos(
-                                                              photoSparepart,
-                                                              dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                              dataSvcDtlJasa?[index].kodeSparepart ?? "",
-                                                            ).length) {
+                                                        child: ListView.builder(
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          itemCount:
+                                                              getAfterPhotos(
+                                                                    photoSparepart,
+                                                                    dataSvcDtlJasa?[index]
+                                                                            .namaSparepart ??
+                                                                        "",
+                                                                    dataSvcDtlJasa?[index]
+                                                                            .kodeSparepart ??
+                                                                        "",
+                                                                  ).length +
+                                                                  _addedImagesAfter
+                                                                      .where((img) =>
+                                                                          img.kodeSparepart ==
+                                                                          dataSvcDtlJasa?[index]
+                                                                              .kodeSparepart)
+                                                                      .length,
+                                                          itemBuilder: (context,
+                                                              photoIndex) {
+                                                            if (photoIndex <
+                                                                getAfterPhotos(
+                                                                  photoSparepart,
+                                                                  dataSvcDtlJasa?[
+                                                                              index]
+                                                                          .namaSparepart ??
+                                                                      "",
+                                                                  dataSvcDtlJasa?[
+                                                                              index]
+                                                                          .kodeSparepart ??
+                                                                      "",
+                                                                ).length) {
                                                               // Display existing photos
-                                                              final List<PhotoSparepart> photos = getAfterPhotos(
+                                                              final List<
+                                                                      PhotoSparepart>
+                                                                  photos =
+                                                                  getAfterPhotos(
                                                                 photoSparepart,
-                                                                dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                                dataSvcDtlJasa?[index].kodeSparepart ?? "",
+                                                                dataSvcDtlJasa?[
+                                                                            index]
+                                                                        .namaSparepart ??
+                                                                    "",
+                                                                dataSvcDtlJasa?[
+                                                                            index]
+                                                                        .kodeSparepart ??
+                                                                    "",
                                                               );
-                                                              final String imageUrl = photos[photoIndex].photoUrl ?? '';
-                                                              final String photoId = photos[photoIndex].id.toString();
-                                                              final String kodesparepart = photos[photoIndex].kodeSparepart ?? '';
+                                                              final String
+                                                                  imageUrl =
+                                                                  photos[photoIndex]
+                                                                          .photoUrl ??
+                                                                      '';
+                                                              final String
+                                                                  photoId =
+                                                                  photos[photoIndex]
+                                                                      .id
+                                                                      .toString();
+                                                              final String
+                                                                  kodesparepart =
+                                                                  photos[photoIndex]
+                                                                          .kodeSparepart ??
+                                                                      '';
 
                                                               // Ensure only network images are shown
-                                                              if (imageUrl.startsWith('http')) {
-                                                                return buildPhotoWidget(imageUrl, photoId, kodesparepart);
+                                                              if (imageUrl
+                                                                  .startsWith(
+                                                                      'http')) {
+                                                                return buildPhotoWidget(
+                                                                    imageUrl,
+                                                                    photoId,
+                                                                    kodesparepart);
                                                               }
                                                               return SizedBox(); // Return an empty widget if the condition is not met
                                                             } else {
                                                               // Display newly added images filtered by kodeSparepart
-                                                              final List<AddedImageAfter> filteredAddedImages = _addedImagesAfter.where((img) => img.kodeSparepart == dataSvcDtlJasa?[index].kodeSparepart).toList();
-                                                              final AddedImageAfter addedImage = filteredAddedImages[photoIndex - getAfterPhotos(
-                                                                photoSparepart,
-                                                                dataSvcDtlJasa?[index].namaSparepart ?? "",
-                                                                dataSvcDtlJasa?[index].kodeSparepart ?? "",
-                                                              ).length];
+                                                              final List<
+                                                                      AddedImageAfter>
+                                                                  filteredAddedImages =
+                                                                  _addedImagesAfter
+                                                                      .where((img) =>
+                                                                          img.kodeSparepart ==
+                                                                          dataSvcDtlJasa?[index]
+                                                                              .kodeSparepart)
+                                                                      .toList();
+                                                              final AddedImageAfter
+                                                                  addedImage =
+                                                                  filteredAddedImages[
+                                                                      photoIndex -
+                                                                          getAfterPhotos(
+                                                                            photoSparepart,
+                                                                            dataSvcDtlJasa?[index].namaSparepart ??
+                                                                                "",
+                                                                            dataSvcDtlJasa?[index].kodeSparepart ??
+                                                                                "",
+                                                                          ).length];
 
-                                                              final String imageUrl = addedImage.file.path; // Adjust based on how XFile is stored
-                                                              final String photoId = addedImage.id;
-                                                              final String kodeSparepart = addedImage.kodeSparepart; // Get kodeSparepart from AddedImage
+                                                              final String
+                                                                  imageUrl =
+                                                                  addedImage
+                                                                      .file
+                                                                      .path; // Adjust based on how XFile is stored
+                                                              final String
+                                                                  photoId =
+                                                                  addedImage.id;
+                                                              final String
+                                                                  kodeSparepart =
+                                                                  addedImage
+                                                                      .kodeSparepart; // Get kodeSparepart from AddedImage
 
                                                               // Return an empty widget as we are hiding local file images
                                                               return SizedBox();
@@ -842,7 +1104,9 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       ),
     );
   }
-  Widget buildPhotoWidget(String imageUrl, String photoId, String kodeSparepart) {
+
+  Widget buildPhotoWidget(
+      String imageUrl, String photoId, String kodeSparepart) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Stack(
@@ -860,19 +1124,19 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: imageUrl.startsWith('http') ?
-              Image.network(
-                imageUrl,
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              ) :
-              Image.file(
-                File(imageUrl),
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              ),
+              child: imageUrl.startsWith('http')
+                  ? Image.network(
+                      imageUrl,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.file(
+                      File(imageUrl),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
           Positioned(
@@ -885,21 +1149,16 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
                   barrierDismissible: true,
                   context: Get.context!,
                   type: QuickAlertType.info,
-                  headerBackgroundColor:
-                  Colors.yellow,
-                  title:
-                  'Anda yakin ingin menghapusnya?',
+                  headerBackgroundColor: Colors.yellow,
+                  title: 'Anda yakin ingin menghapusnya?',
                   confirmBtnText: 'Hapus',
                   cancelBtnText: 'Batal',
                   confirmBtnColor: Colors.green,
                   onConfirmBtnTap: () async {
-                    var response =
-                    await API.DeletesPerpartID(
-                        id: photoId);
+                    var response = await API.DeletesPerpartID(id: photoId);
                     if (response.status == true) {
                       _reloadData();
-                      Navigator.of(Get.context!)
-                          .pop();
+                      Navigator.of(Get.context!).pop();
                     } else {}
                   },
                 );
@@ -922,6 +1181,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       ),
     );
   }
+
   Widget _buildInfoRow(String title, String value, {Color? color}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -932,7 +1192,8 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
             style: const TextStyle(
               fontWeight: FontWeight.normal,
             ),
-            overflow: TextOverflow.ellipsis, // Ensures the text does not overflow
+            overflow:
+                TextOverflow.ellipsis, // Ensures the text does not overflow
           ),
         ),
         Flexible(
@@ -941,7 +1202,8 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: color ?? Colors.black,
-              overflow: TextOverflow.ellipsis, // Ensures the text does not overflow
+              overflow:
+                  TextOverflow.ellipsis, // Ensures the text does not overflow
             ),
             textAlign: TextAlign.right, // Aligns the text to the right
           ),
@@ -949,6 +1211,7 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
       ],
     );
   }
+
   void _onLoading() {
     _refreshController.loadComplete();
   }
@@ -961,15 +1224,25 @@ class _CardDetailPKBSperepartState extends State<CardDetailPKBSperepart> {
     _refreshController.refreshCompleted();
   }
 
-  List<PhotoSparepart> getBeforePhotos(List<PhotoSparepart> photoSparepart, String namaSparepart, String kodeSparepart) {
-    return photoSparepart.where((photo) => photo.photoType?.toLowerCase() == 'before' && photo.kodeSparepart == kodeSparepart).toList();
+  List<PhotoSparepart> getBeforePhotos(List<PhotoSparepart> photoSparepart,
+      String namaSparepart, String kodeSparepart) {
+    return photoSparepart
+        .where((photo) =>
+            photo.photoType?.toLowerCase() == 'before' &&
+            photo.kodeSparepart == kodeSparepart)
+        .toList();
   }
 
-  List<PhotoSparepart> getAfterPhotos(List<PhotoSparepart> photoSparepart, String namaSparepart, String kodeSparepart) {
-    return photoSparepart.where((photo) => photo.photoType?.toLowerCase() == 'after' && photo.kodeSparepart == kodeSparepart).toList();
+  List<PhotoSparepart> getAfterPhotos(List<PhotoSparepart> photoSparepart,
+      String namaSparepart, String kodeSparepart) {
+    return photoSparepart
+        .where((photo) =>
+            photo.photoType?.toLowerCase() == 'after' &&
+            photo.kodeSparepart == kodeSparepart)
+        .toList();
   }
-
 }
+
 class AddedImageBefor {
   String id;
   String kodeSparepart;
@@ -981,6 +1254,7 @@ class AddedImageBefor {
     required this.file,
   });
 }
+
 class AddedImageAfter {
   String id;
   String kodeSparepart;

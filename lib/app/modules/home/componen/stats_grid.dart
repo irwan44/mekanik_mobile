@@ -1,11 +1,12 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:http/http.dart' as http;
-import '../../../componen/color.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
+
 import '../../../data/data_endpoint/bookingmasuk.dart';
 import '../../../data/data_endpoint/invoicehome.dart';
 import '../../../data/data_endpoint/servicedikerjakan.dart';
@@ -27,6 +28,7 @@ class _StatsGridState extends State<StatsGrid> {
     super.initState();
     _fetchWeatherData();
   }
+
   Future<void> _fetchWeatherData() async {
     setState(() {
       _loading = true;
@@ -67,214 +69,17 @@ class _StatsGridState extends State<StatsGrid> {
       });
     }
   }
-  Future<void> _refreshWeatherData() async {
-    await _fetchWeatherData();
-  }
-
-  LinearGradient _getGradient(double temperature) {
-    if (temperature <= 0) {
-      return LinearGradient(
-        colors: [Colors.blue.shade800, Colors.blue.shade200],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
-    } else if (temperature <= 10) {
-      return LinearGradient(
-        colors: [Colors.blue.shade600, Colors.blue.shade400],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
-    } else if (temperature <= 20) {
-      return LinearGradient(
-        colors: [Colors.blue.shade300, Colors.orange.shade300],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
-    } else if (temperature <= 30) {
-      return LinearGradient(
-        colors: [Colors.orange.shade400, Colors.orange.shade600],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
-    } else {
-      return LinearGradient(
-        colors: [Colors.orange.shade800, Colors.red.shade800],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.50,
+      height: MediaQuery.of(context).size.height * 0.25,
       child: Column(
         children: <Widget>[
-          _loading
-              ? Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column
-                (children: [
-                SizedBox(height: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'loading...',
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                            Text(
-                              'loading...,°C', // Tidak perlu konversi
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
-                            Text(
-                              'Cuaca: loading...',
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-              )
-          )
-              : _errorMessage.isNotEmpty
-              ? Center(child: Text(_errorMessage))
-              : _weatherData != null
-              ? Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: _getGradient(
-                        _weatherData!['main']['temp']),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${_weatherData!['name']}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6
-                                  ?.copyWith(
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              'Suhu: ${_weatherData!['main']['temp']}°C',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle1
-                                  ?.copyWith(
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              'Cuaca: ${_weatherData!['weather'][0]['description']}',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle1
-                                  ?.copyWith(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Image.network(
-                          'https://openweathermap.org/img/wn/${_weatherData!['weather'][0]['icon']}@2x.png',
-                          width: 80,
-                          height: 80,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
-              : Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(children: [
-                SizedBox(height: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.15),
-                        spreadRadius: 5,
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'loading...',
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                            Text(
-                              'loading...,°C', // Tidak perlu konversi
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
-                            Text(
-                              'Cuaca: loading...',
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-              )
-          ),
           Flexible(
             child: Row(
               children: <Widget>[
-                _buildFutureStatCard<MasukBooking>(
+                _buildFutureStatCardBooking<MasukBooking>(
                   future: API.BookingMasukID(),
                   color: Colors.orange,
                   onTapRoute: Routes.BOOKINGMASUK,
@@ -298,16 +103,132 @@ class _StatsGridState extends State<StatsGrid> {
                   onTapRoute: Routes.SELESAIDIKERJAKAN,
                   dataLabel: "Service Dikerjakan",
                 ),
-                _buildFutureStatCard2<InvoiceHome>(
+                _buildFutureStatCardServiceDikerjakan<InvoiceHome>(
                   future: API.InvoiceID(),
                   color: Colors.purple,
                   onTapRoute: Routes.INVOICEMASUK,
-                  dataLabel: "Invoice",
+                  dataLabel: "PKB Service",
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFutureStatCardBooking<T>({
+    required Future<T> future,
+    required Color color,
+    required String onTapRoute,
+    required String dataLabel,
+  }) {
+    return Expanded(
+      child: FutureBuilder<T>(
+        future: future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return _buildLoadingCard(color);
+          } else if (snapshot.hasError) {
+            return Shimmer(
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Tidak ada Internet',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Hari ini',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '0',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          } else {
+            var data = snapshot.data;
+            var count = '0';
+            var label = dataLabel;
+
+            if (data is MasukBooking) {
+              count = data.countBookingMasuk?.toString() ?? '0';
+            } else if (data is ServiceSelesaiHome) {
+              count = data.countBookingMasuk?.toString() ?? '0';
+            } else if (data is ServiceDikerjakan) {
+              count = data.countDikerjakan?.toString() ?? '0';
+            } else if (data is InvoiceHome) {
+              count = data.countInvoice?.toString() ?? '0';
+            }
+
+            return InkWell(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Get.toNamed(Routes.BOKING);
+              },
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Hari ini',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      count,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        },
       ),
     );
   }
@@ -382,7 +303,7 @@ class _StatsGridState extends State<StatsGrid> {
             return InkWell(
               onTap: () {
                 HapticFeedback.lightImpact();
-                Get.toNamed(onTapRoute);
+                Get.toNamed(Routes.SELESAISERVICE);
               },
               child: Container(
                 margin: const EdgeInsets.all(8.0),
@@ -496,7 +417,121 @@ class _StatsGridState extends State<StatsGrid> {
             return InkWell(
               onTap: () {
                 HapticFeedback.lightImpact();
-                Get.toNamed(onTapRoute);
+                Get.toNamed(Routes.SELESAIDIKERJAKAN);
+              },
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Text(
+                      'Hari ini',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      count,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildFutureStatCardServiceDikerjakan<T>({
+    required Future<T> future,
+    required Color color,
+    required String onTapRoute,
+    required String dataLabel,
+  }) {
+    return Expanded(
+      child: FutureBuilder<T>(
+        future: future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return _buildLoadingCard(color);
+          } else if (snapshot.hasError) {
+            return Shimmer(
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Tidak ada Internet',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Hari ini',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      '0',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          } else {
+            var data = snapshot.data;
+            var count = '0';
+            var label = dataLabel;
+
+            if (data is MasukBooking) {
+              count = data.countBookingMasuk?.toString() ?? '0';
+            } else if (data is ServiceSelesaiHome) {
+              count = data.countBookingMasuk?.toString() ?? '0';
+            } else if (data is ServiceDikerjakan) {
+              count = data.countDikerjakan?.toString() ?? '0';
+            }
+
+            return InkWell(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Get.toNamed(Routes.PROMEX);
               },
               child: Container(
                 margin: const EdgeInsets.all(8.0),
@@ -620,7 +655,6 @@ class _StatsGridState extends State<StatsGrid> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
           ],
         ),
       ),

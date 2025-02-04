@@ -1,33 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:mekanik/app/componen/color.dart';
 
-import '../../../data/data_endpoint/boking.dart';
 import '../../../data/data_endpoint/pkb.dart';
 
 class PkbList extends StatelessWidget {
   final DataPKB items;
   final VoidCallback onTap;
 
-  const PkbList({Key? key, required this.items, required this.onTap}) : super(key: key);
+  const PkbList({Key? key, required this.items, required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    Color statusColor = StatusColor.getColor(items.status ?? '');
+    final Color statusColor = StatusColor.getColor(items.status ?? '');
+
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.all(10),
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.15),
-              spreadRadius: 5,
-              blurRadius: 10,
+              spreadRadius: 3,
+              blurRadius: 6,
               offset: const Offset(0, 3),
             ),
           ],
@@ -35,67 +34,53 @@ class PkbList extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.only(bottom: 10, top: 10, right: 15, left: 15),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.15),
-                    spreadRadius: 5,
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
+            // SECTION: Header (Nama Cabang & Status)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ICON / Gambar Samping (Opsional)
+                CircleAvatar(
+                  radius: 22,
+                  backgroundColor: Colors.blue.shade100,
+                  child: Icon(
+                    Icons.home_repair_service,
+                    color: Colors.blue.shade700,
                   ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+                const SizedBox(width: 12),
+                // Nama Cabang
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            items.namaCabang ?? '',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 10,),
-                          Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.orange,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(children: [
-                                Text('Vin Number', style: TextStyle(color: Colors.white),),
-                                Text(
-                                  items.vinNumber ?? 'Vin Number kosong',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                                ),
-                              ],)
-
-                          ),
-                        ],
+                      Text(
+                        items.namaCabang ?? 'Nama Cabang',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+                      const SizedBox(height: 8),
+                      // VIN Number Badge
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: statusColor,
-                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            const Text(
+                              'Vin Number',
+                              style: TextStyle(color: Colors.white),
+                            ),
                             Text(
-                              items.status ?? '',
+                              items.vinNumber ?? 'Vin Number kosong',
                               style: const TextStyle(
-                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
                           ],
@@ -103,184 +88,185 @@ class PkbList extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  const Divider(color: Colors.grey),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Tanggal Estimasi',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          Text(
-                            items.tglEstimasi?.split(" ")[0] ?? "",
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const Text(
-                            'Jam Estimasi',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          Text(
-                            items.tglEstimasi?.split(" ")[1] ?? "",
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                ),
+                // Status
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                  const Divider(color: Colors.grey),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                          const Text(
-                            'Tanggal PKB',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          Text(
-                            items.tglPkb?.split(" ")[0] ?? "",
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text(
-                            'Kode PKB',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          Text(
-                            items.kodePkb ?? '',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  child: Text(
+                    (items.status ?? '').toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const Divider(color: Colors.grey),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Pelanggan'),
-                          Text(
-                            items.nama ?? '',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text('Kode Pelanggan'),
-                          Text(
-                            items.kodePelanggan.toString(),
-                            style: const TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            const Text(
-              'Detail Kendaraaan Pelanggan',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
+            const Divider(),
+
+            // SECTION: Tanggal Estimasi & Jam Estimasi
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Tanggal Estimasi
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Merek :'),
+                    _subTitleText('Tanggal Estimasi'),
+                    const SizedBox(height: 4),
+                    _boldText(items.tglEstimasi?.split(" ")[0]),
+                  ],
+                ),
+                // Jam Estimasi
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _subTitleText('Jam Estimasi'),
+                    const SizedBox(height: 4),
+                    _boldText(items.tglEstimasi?.split(" ")[1]),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(),
+
+            // SECTION: Tanggal PKB & Kode PKB
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Tanggal PKB
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _subTitleText('Tanggal PKB'),
+                    const SizedBox(height: 4),
+                    _boldText(items.tglPkb?.split(" ")[0]),
+                  ],
+                ),
+                // Kode PKB
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _subTitleText('Kode PKB'),
+                    const SizedBox(height: 4),
+                    _boldText(items.kodePkb),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(),
+
+            // SECTION: Pelanggan & Kode Pelanggan
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Pelanggan
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _subTitleText('Pelanggan'),
+                    const SizedBox(height: 4),
+                    _boldText(items.nama),
+                  ],
+                ),
+                // Kode Pelanggan
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _subTitleText('Kode Pelanggan'),
+                    const SizedBox(height: 4),
                     Text(
-                      items.namaMerk ?? '',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const Text('Warna :'),
-                    Text(
-                      items.warna ?? '',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      items.kodePelanggan.toString(),
+                      style: const TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
-                Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // SECTION: Detail Kendaraan Pelanggan
+            const Text(
+              'Detail Kendaraan Pelanggan',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Kolom Kiri: Merek & Warna
+                Expanded(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Type :'),
-                      Text(
-                        items.namaTipe ?? '',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const Text('NoPol :'),
-                      Text(
-                        items.noPolisi ?? '',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      _subTitleText('Merek'),
+                      const SizedBox(height: 4),
+                      _boldText(items.namaMerk),
+                      const SizedBox(height: 8),
+                      _subTitleText('Warna'),
+                      const SizedBox(height: 4),
+                      _boldText(items.warna),
                     ],
-
+                  ),
+                ),
+                const SizedBox(width: 20),
+                // Kolom Kanan: Type & NoPol
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _subTitleText('Type'),
+                      const SizedBox(height: 4),
+                      _boldText(items.namaTipe),
+                      const SizedBox(height: 8),
+                      _subTitleText('NoPol'),
+                      const SizedBox(height: 4),
+                      _boldText(items.noPolisi),
+                    ],
+                  ),
                 ),
               ],
             ),
           ],
         ),
       ),
+    );
+  }
+
+  /// Helper untuk teks label/subtitle.
+  Widget _subTitleText(String? text) {
+    return Text(
+      text ?? '',
+      style: const TextStyle(
+        fontSize: 13,
+        color: Colors.grey,
+      ),
+    );
+  }
+
+  /// Helper untuk teks data yang lebih menonjol.
+  Widget _boldText(String? text) {
+    return Text(
+      text ?? '-',
+      style: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+      ),
+      overflow: TextOverflow.ellipsis,
     );
   }
 }
@@ -313,7 +299,7 @@ class StatusColor {
       case 'ditolak':
         return Colors.red;
       default:
-        return Colors.transparent;
+        return Colors.grey; // Warna default jika tidak terdefinisi
     }
   }
 }

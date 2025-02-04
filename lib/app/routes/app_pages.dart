@@ -34,6 +34,7 @@ import '../modules/promek/detail/detailpkb.dart';
 import '../modules/promek/detail/detailpkbview.dart';
 import '../modules/promek/start_stop/start_stop_view.dart';
 import '../modules/promek/views/pkb.dart';
+import '../modules/promek/views/view.dart';
 import '../modules/repair_maintenen/bindings/repair_maintenen_binding.dart';
 import '../modules/repair_maintenen/views/repair_maintenen_edit.dart';
 import '../modules/repair_maintenen/views/repair_maintenen_view.dart';
@@ -227,6 +228,11 @@ class AppPages {
     GetPage(
       name: _Paths.INVOICEMASUK,
       page: () => const InvoicemasukView(),
+      binding: InvoicemasukBinding(),
+    ),
+    GetPage(
+      name: _Paths.PROMEX,
+      page: () => StackOver(),
       binding: InvoicemasukBinding(),
     ),
   ];

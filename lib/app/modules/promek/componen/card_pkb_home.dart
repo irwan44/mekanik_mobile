@@ -1,58 +1,54 @@
 import 'package:flutter/material.dart';
 
-import '../../../data/data_endpoint/uploadperpart.dart';
+import '../../../data/data_endpoint/pkb.dart';
 
-class PkbListSperpart extends StatelessWidget {
-  final DataPhotosparepart items;
+class PkbListHome extends StatelessWidget {
+  final DataPKB items;
   final VoidCallback onTap;
 
-  const PkbListSperpart({
-    Key? key,
-    required this.items,
-    required this.onTap,
-  }) : super(key: key);
+  const PkbListHome({Key? key, required this.items, required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Jika Anda punya status, Anda dapat menggunakan baris berikut
-    // final Color statusColor = StatusColor.getColor(items.status ?? '');
+    final Color statusColor = StatusColor.getColor(items.status ?? '');
 
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.15),
-              spreadRadius: 3,
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
-          ],
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Colors.grey.withOpacity(0.15),
+          //     spreadRadius: 3,
+          //     blurRadius: 6,
+          //     offset: const Offset(0, 3),
+          //   ),
+          // ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // SECTION: HEADER (Nama Cabang & VIN Number)
+            // SECTION: Header (Nama Cabang & Status)
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ICON: opsional, ganti sesuai kebutuhan
+                // ICON / Gambar Samping (Opsional)
                 CircleAvatar(
                   radius: 22,
                   backgroundColor: Colors.blue.shade100,
                   child: Icon(
-                    Icons.home_repair_service_outlined,
+                    Icons.home_repair_service,
                     color: Colors.blue.shade700,
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Nama Cabang & VIN Number
+                // Nama Cabang
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,12 +61,10 @@ class PkbListSperpart extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      // VIN Number (Badge)
+                      // VIN Number Badge
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
+                            horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
                           color: Colors.orange,
                           borderRadius: BorderRadius.circular(6),
@@ -95,12 +89,28 @@ class PkbListSperpart extends StatelessWidget {
                     ],
                   ),
                 ),
+                // Status
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    (items.status ?? '').toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 12),
             const Divider(),
 
-            // SECTION: TANGGAL & JAM ESTIMASI
+            // SECTION: Tanggal Estimasi & Jam Estimasi
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -127,7 +137,7 @@ class PkbListSperpart extends StatelessWidget {
             const SizedBox(height: 12),
             const Divider(),
 
-            // SECTION: TANGGAL PKB & KODE PKB
+            // SECTION: Tanggal PKB & Kode PKB
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -154,11 +164,11 @@ class PkbListSperpart extends StatelessWidget {
             const SizedBox(height: 12),
             const Divider(),
 
-            // SECTION: PELANGGAN
+            // SECTION: Pelanggan & Kode Pelanggan
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Nama Pelanggan
+                // Pelanggan
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -174,7 +184,7 @@ class PkbListSperpart extends StatelessWidget {
                     _subTitleText('Kode Pelanggan'),
                     const SizedBox(height: 4),
                     Text(
-                      items.kodePelanggan?.toString() ?? '-',
+                      items.kodePelanggan.toString(),
                       style: const TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
@@ -186,9 +196,9 @@ class PkbListSperpart extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // SECTION: DETAIL KENDARAAN
+            // SECTION: Detail Kendaraan Pelanggan
             const Text(
-              'Detail Kendaraaan Pelanggan',
+              'Detail Kendaraan Pelanggan',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
@@ -237,18 +247,18 @@ class PkbListSperpart extends StatelessWidget {
     );
   }
 
-  /// Helper untuk teks label/subtitle (mis. "Tanggal PKB", "Jam Estimasi").
-  Widget _subTitleText(String label) {
+  /// Helper untuk teks label/subtitle.
+  Widget _subTitleText(String? text) {
     return Text(
-      label,
+      text ?? '',
       style: const TextStyle(
-        color: Colors.grey,
         fontSize: 13,
+        color: Colors.grey,
       ),
     );
   }
 
-  /// Helper untuk teks data utama agar menonjol (bold).
+  /// Helper untuk teks data yang lebih menonjol.
   Widget _boldText(String? text) {
     return Text(
       text ?? '-',
@@ -271,22 +281,25 @@ class StatusColor {
       case 'diproses':
         return Colors.orange;
       case 'estimasi':
-        return Colors.lime;
+        return Colors.green;
       case 'selesai dikerjakan':
         return Colors.blue;
       case 'pkb':
         return Colors.green;
       case 'pkb tutup':
-        return Colors.yellow;
+        return Colors.redAccent;
       case 'invoice':
-        return Colors.yellow;
+        return Colors.blue;
       case 'lunas':
-        return Colors.yellow;
+        return Colors.green;
       case 'ditolak by sistem':
+        return Colors.red;
+      case 'cancel booking':
+        return Colors.red;
       case 'ditolak':
         return Colors.red;
       default:
-        return Colors.transparent;
+        return Colors.grey; // Warna default jika tidak terdefinisi
     }
   }
 }

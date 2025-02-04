@@ -33,6 +33,7 @@ abstract class Routes {
   static const ListPeriodical = _Paths.ListPeriodical;
   static const StarStopProdical = _Paths.StarStopProdical;
   static const PPRODICAL_STOP = _Paths.PPRODICAL_STOP;
+  static const PROMEX = _Paths.PROMEX;
 }
 
 abstract class _Paths {
@@ -67,4 +68,5 @@ abstract class _Paths {
   static const ListPeriodical = '/ListPeriodical';
   static const StarStopProdical = '/StarStopProdical';
   static const PPRODICAL_STOP = '/PPRODICAL_STOP';
+  static const PROMEX = '/PROMEX';
 }

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../data/data_endpoint/boking.dart';
 
-class BokingList extends StatelessWidget {
+class BokingListHome extends StatelessWidget {
   final DataBooking items;
   final VoidCallback onTap;
 
-  const BokingList({Key? key, required this.items, required this.onTap})
+  const BokingListHome({Key? key, required this.items, required this.onTap})
       : super(key: key);
 
   @override
@@ -16,7 +16,7 @@ class BokingList extends StatelessWidget {
     return Card(
       elevation: 0,
       color: Colors.white,
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      margin: const EdgeInsets.symmetric(vertical: 6),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),

@@ -1,148 +1,241 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-
 import 'package:get/get.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../componen/color.dart';
-import '../../../data/data_endpoint/servicedikerjakan.dart';
+import '../../../componen/loading_shammer_booking.dart';
+import '../../../data/data_endpoint/boking.dart';
+import '../../../data/data_endpoint/kategory.dart';
 import '../../../data/endpoint.dart';
-import '../componen/list_card_selesai_dikerjakan.dart';
-import '../controllers/selesaidikerjakan_controller.dart';
+import '../../../routes/app_pages.dart';
+import '../../boking/componen/card_booking.dart';
 
-class SelesaidikerjakanView extends StatefulWidget {
-  const SelesaidikerjakanView({super.key});
+class SelesaiserviceView extends StatefulWidget {
+  const SelesaiserviceView({super.key});
 
   @override
-  State<SelesaidikerjakanView> createState() => _SelesaidikerjakanViewState();
+  State<SelesaiserviceView> createState() => _SelesaiserviceViewState();
 }
 
-class _SelesaidikerjakanViewState extends State<SelesaidikerjakanView> {
-  late RefreshController _refreshController; // the refresh controller
-  @override
-  void initState() {
-    _refreshController =
-        RefreshController(); // we have to use initState because this part of the app have to restart
-    super.initState();
-  }
+class _SelesaiserviceViewState extends State<SelesaiserviceView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-          systemNavigationBarColor: Colors.white,
-        ),
-        title: Text('Service Dikerjakan',style: TextStyle(color: MyColors.appPrimaryColor, fontWeight: FontWeight.bold),),
-        centerTitle: false,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
+        forceMaterialTransparency: true,
+        title: Text('Service Selesai Dikerjakan'),
       ),
-      body: SmartRefresher(
-    controller: _refreshController,
-    enablePullDown: true,
-    header: const WaterDropHeader(),
-    onLoading: _onLoading,
-    onRefresh: _onRefresh,
-    child:
-      SingleChildScrollView(
-        child: FutureBuilder(
-          future: API.DikerjakanID(),
+      body: SingleChildScrollView(
+        child: FutureBuilder<Boking>(
+          future: API.bokingid(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: CircularProgressIndicator(),
+              return const SingleChildScrollView(
+                child: Loadingshammer(),
               );
             } else if (snapshot.hasError) {
-              return Center(
-                child: Text('Error: ${snapshot.error}'),
+              return SingleChildScrollView(
+                child: Loadingshammer(),
               );
             } else if (snapshot.hasData) {
-              ServiceDikerjakan? data = snapshot.data as ServiceDikerjakan?;
-              if (data != null) {
-                // Anda dapat mengakses atribut status seperti ini jika telah didefinisikan dalam kelas MasukBooking
-                int? status = data.countDikerjakan;
-                if (status != null) {
-                  if (data.countDikerjakan == 0) {
-                    return Container(
-                      height: 500,
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/icons/car.png',
-                            width: 100.0,
-                            height: 100.0,
-                            fit: BoxFit.cover,
-                          ),
-                          SizedBox(height: 10,),
-                          Text('Belum ada Service yang Dikerjakan hari ini', style: TextStyle(color: MyColors.appPrimaryColor, fontWeight: FontWeight.bold),)
-                        ],),
-                    );
-                  } else {
-                    return Column(
-                      children: AnimationConfiguration.toStaggeredList(
-                        duration: const Duration(milliseconds: 475),
-                        childAnimationBuilder: (widget) => SlideAnimation(
-                          child: FadeInAnimation(
-                            child: widget,
+              Boking getDataAcc = snapshot.data!;
+              if (getDataAcc.status == false) {
+                return SizedBox(
+                  height: 400,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/icons/booking.png',
+                          width: 100.0,
+                          height: 100.0,
+                          fit: BoxFit.cover,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Belum ada data Service yang selesai',
+                          style: TextStyle(
+                            color: MyColors.appPrimaryColor,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        children: data.dataDikerjakan != null
-                            ? data.dataDikerjakan!.map((e) {
-                          return ListSelesaiDikerjakan(
-                            items: e,
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                            },
-                          );
-                        }).toList()
-                            : [],
-                      ),
-                    );
-                  }
-                } else {
-                  return Center(
-                    child: Text('Status is false'),
-                  );
+                      ],
+                    ),
+                  ),
+                );
+              } else if (getDataAcc.message == 'Invalid token: Expired') {
+                Get.offAllNamed(Routes.SIGNIN);
+                return const SizedBox.shrink();
+              }
+              // Hanya mengambil data dengan bookingStatus == 'selesai dikerjakan'
+              List<DataBooking> filteredList = getDataAcc.dataBooking!
+                  .where((item) =>
+                      item.bookingStatus != null &&
+                      item.bookingStatus!.toLowerCase() == 'diproses')
+                  .toList();
+              // Sort data berdasarkan tgl_booking dan jam_booking (terbaru ke terlama)
+              filteredList.sort((a, b) {
+                DateTime? aDateTime;
+                DateTime? bDateTime;
+
+                try {
+                  aDateTime = DateTime.parse('${a.tglBooking} ${a.jamBooking}');
+                } catch (e) {
+                  aDateTime = null;
                 }
-              } else {
-                return Center(
-                  child: Text('Data is null'),
+
+                try {
+                  bDateTime = DateTime.parse('${b.tglBooking} ${b.jamBooking}');
+                } catch (e) {
+                  bDateTime = null;
+                }
+
+                if (aDateTime == null && bDateTime == null) {
+                  return 0;
+                } else if (aDateTime == null) {
+                  return 1;
+                } else if (bDateTime == null) {
+                  return -1;
+                } else {
+                  return bDateTime.compareTo(aDateTime);
+                }
+              });
+
+              if (filteredList.isEmpty) {
+                return SizedBox(
+                  height: 400,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/icons/booking.png',
+                          width: 100.0,
+                          height: 100.0,
+                          fit: BoxFit.cover,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Belum ada data Service yang selesai',
+                          style: TextStyle(
+                            color: MyColors.appPrimaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               }
-            } else {
-              return SizedBox(
-                height: Get.height - 250,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [],
+
+              return Column(
+                children: AnimationConfiguration.toStaggeredList(
+                  duration: const Duration(milliseconds: 475),
+                  childAnimationBuilder: (widget) => SlideAnimation(
+                    child: FadeInAnimation(
+                      child: widget,
+                    ),
                   ),
+                  children: filteredList
+                      .map(
+                        (e) => BokingList(
+                          items: e,
+                          onTap: () async {
+                            HapticFeedback.lightImpact();
+                            if (kDebugMode) {
+                              print(
+                                  'Nilai e.namaService: ${e.namaService ?? ''}');
+                            }
+
+                            if (e.bookingStatus != null &&
+                                e.namaService != null) {
+                              String kategoriKendaraanId = '';
+                              final generalData = await API.kategoriID();
+                              if (generalData != null) {
+                                final matchingKategori = generalData
+                                    .dataKategoriKendaraan
+                                    ?.firstWhere(
+                                  (kategori) =>
+                                      kategori.kategoriKendaraan ==
+                                      e.kategoriKendaraan,
+                                  orElse: () => DataKategoriKendaraan(
+                                    kategoriKendaraanId: '',
+                                    kategoriKendaraan: '',
+                                  ),
+                                );
+                                if (matchingKategori != null &&
+                                    matchingKategori is DataKategoriKendaraan) {
+                                  kategoriKendaraanId =
+                                      matchingKategori.kategoriKendaraanId ??
+                                          '';
+                                }
+                              }
+
+                              final arguments = {
+                                'tgl_booking': e.tglBooking ?? '',
+                                'jam_booking': e.jamBooking ?? '',
+                                'nama': e.nama ?? '',
+                                'kode_kendaraan': e.kodeKendaraan ?? '',
+                                'kode_pelanggan': e.kodePelanggan ?? '',
+                                'kode_booking': e.kodeBooking ?? '',
+                                'nama_jenissvc': e.namaService ?? '',
+                                'no_polisi': e.noPolisi ?? '',
+                                'tahun': e.tahun ?? '',
+                                'keluhan': e.keluhan ?? '',
+                                'pm_opt': e.pmopt ?? '',
+                                'type_order': e.typeOrder ?? '',
+                                'kategori_kendaraan': e.kategoriKendaraan ?? '',
+                                'kategori_kendaraan_id': kategoriKendaraanId,
+                                'warna': e.warna ?? '',
+                                'hp': e.hp ?? '',
+                                'vin_number': e.vinNumber ?? '',
+                                'nama_merk': e.namaMerk ?? '',
+                                'transmisi': e.transmisi ?? '',
+                                'nama_tipe': e.namaTipe ?? '',
+                                'alamat': e.alamat ?? '',
+                                'booking_id': e.bookingId ?? '',
+                                'status': e.bookingStatus ?? '',
+                              };
+
+                              if (e.bookingStatus!.toLowerCase() == 'booking') {
+                                Get.toNamed(
+                                  Routes.APPROVE,
+                                  arguments: arguments,
+                                );
+                              } else if (e.bookingStatus!.toLowerCase() ==
+                                  'approve') {
+                                // Penanganan lainnya
+                              } else {
+                                Get.toNamed(
+                                  Routes.DetailBooking,
+                                  arguments: arguments,
+                                );
+                              }
+                            } else {
+                              print(
+                                  'Booking status atau namaService bernilai null');
+                            }
+                          },
+                        ),
+                      )
+                      .toList(),
                 ),
+              );
+            } else {
+              return const Center(
+                child: Text('No data'),
               );
             }
           },
         ),
       ),
-      ),
     );
-  }
-  _onLoading() {
-    _refreshController
-        .loadComplete(); // after data returned,set the //footer state to idle
-  }
-
-  _onRefresh() {
-    HapticFeedback.lightImpact();
-    setState(() {
-// so whatever you want to refresh it must be inside the setState
-      const SelesaidikerjakanView(); // if you only want to refresh the list you can place this, so the two can be inside setState
-      _refreshController
-          .refreshCompleted(); // request complete,the header will enter complete state,
-// resetFooterState : it will set the footer state from noData to idle
-    });
   }
 }

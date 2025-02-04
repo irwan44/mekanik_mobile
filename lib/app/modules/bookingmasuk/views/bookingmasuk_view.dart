@@ -4,6 +4,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:mekanik/app/componen/color.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+
 import '../../../data/data_endpoint/bookingmasuk.dart';
 import '../../../data/endpoint.dart';
 import '../componen/list_card_booking_masuk.dart';
@@ -23,9 +24,11 @@ class _BookingmasukViewState extends State<BookingmasukView> {
         RefreshController(); // we have to use initState because this part of the app have to restart
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
@@ -33,7 +36,11 @@ class _BookingmasukViewState extends State<BookingmasukView> {
           statusBarBrightness: Brightness.light,
           systemNavigationBarColor: Colors.white,
         ),
-        title: Text('Booking masuk',style: TextStyle(color: MyColors.appPrimaryColor, fontWeight: FontWeight.bold), ),
+        title: Text(
+          'Booking masuk',
+          style: TextStyle(
+              color: MyColors.appPrimaryColor, fontWeight: FontWeight.bold),
+        ),
         centerTitle: false,
       ),
       body: SmartRefresher(
@@ -42,89 +49,98 @@ class _BookingmasukViewState extends State<BookingmasukView> {
         header: const WaterDropHeader(),
         onLoading: _onLoading,
         onRefresh: _onRefresh,
-        child: SingleChildScrollView(child:
-        FutureBuilder(
-          future: API.BookingMasukID(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Text('Error: ${snapshot.error}'),
-              );
-            } else if (snapshot.hasData) {
-              MasukBooking? data = snapshot.data as MasukBooking?;
-              if (data != null) {
-                int? status = data.countBookingMasuk;
-                if (status != null) {
-                  if (data.countBookingMasuk == 0) {
-                    return Container(
-                      height: 500,
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/icons/car.png',
-                            width: 100.0,
-                            height: 100.0,
-                            fit: BoxFit.cover,
-                          ),
-                          SizedBox(height: 10,),
-                          Text('Belum ada Service yang Dikerjakan hari ini', style: TextStyle(color: MyColors.appPrimaryColor, fontWeight: FontWeight.bold),)
-                        ],),
-                    );
-                  } else {
-                    return Column(
-                      children: AnimationConfiguration.toStaggeredList(
-                        duration: const Duration(milliseconds: 475),
-                        childAnimationBuilder: (widget) => SlideAnimation(
-                          child: FadeInAnimation(
-                            child: widget,
-                          ),
+        child: SingleChildScrollView(
+          child: FutureBuilder(
+            future: API.BookingMasukID(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${snapshot.error}'),
+                );
+              } else if (snapshot.hasData) {
+                MasukBooking? data = snapshot.data as MasukBooking?;
+                if (data != null) {
+                  int? status = data.countBookingMasuk;
+                  if (status != null) {
+                    if (data.countBookingMasuk == 0) {
+                      return Container(
+                        height: 500,
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/icons/car.png',
+                              width: 100.0,
+                              height: 100.0,
+                              fit: BoxFit.cover,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              'Belum ada Service yang Dikerjakan hari ini',
+                              style: TextStyle(
+                                  color: MyColors.appPrimaryColor,
+                                  fontWeight: FontWeight.bold),
+                            )
+                          ],
                         ),
-                        children: data.bookingMasuk != null
-                            ? data.bookingMasuk!.map((e) {
-                          return ListBookingMasuk(
-                            items: e,
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                            },
-                          );
-                        }).toList()
-                            : [],
-                      ),
+                      );
+                    } else {
+                      return Column(
+                        children: AnimationConfiguration.toStaggeredList(
+                          duration: const Duration(milliseconds: 475),
+                          childAnimationBuilder: (widget) => SlideAnimation(
+                            child: FadeInAnimation(
+                              child: widget,
+                            ),
+                          ),
+                          children: data.bookingMasuk != null
+                              ? data.bookingMasuk!.map((e) {
+                                  return ListBookingMasuk(
+                                    items: e,
+                                    onTap: () {
+                                      HapticFeedback.lightImpact();
+                                    },
+                                  );
+                                }).toList()
+                              : [],
+                        ),
+                      );
+                    }
+                  } else {
+                    return Center(
+                      child: Text('Status is false'),
                     );
                   }
                 } else {
                   return Center(
-                    child: Text('Status is false'),
+                    child: Text('Data is null'),
                   );
                 }
               } else {
-                return Center(
-                  child: Text('Data is null'),
+                return SizedBox(
+                  height: Get.height - 250,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [],
+                    ),
+                  ),
                 );
               }
-            } else {
-              return SizedBox(
-                height: Get.height - 250,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [],
-                  ),
-                ),
-              );
-            }
-          },
-        ),
+            },
+          ),
         ),
       ),
     );
   }
+
   _onLoading() {
     _refreshController
         .loadComplete(); // after data returned,set the //footer state to idle
